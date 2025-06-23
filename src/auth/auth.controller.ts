@@ -1,4 +1,5 @@
 import { AppConfigService } from '@/config/app-config.service';
+import { UserResponse } from '@/user/dto/user-response.dto';
 import { Body, Controller, Get, Post, Res, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { User } from '@prisma/client';
@@ -6,7 +7,7 @@ import { CookieOptions, Response } from 'express';
 import { AuthService } from './auth.service';
 import { GetUser } from './decorator/get-user.decorator';
 import { Public } from './decorator/public.decorator';
-import { RegisterRequestDto } from './dto/register-request.dto';
+import { RegisterRequest } from './dto/register-request.dto';
 import { OAuthUser } from './interface/auth.interface';
 
 @Controller('auth')
@@ -55,11 +56,11 @@ export class AuthController {
   @Public()
   @Post('register')
   @UseGuards(AuthGuard('jwt-register'))
-  async register(@GetUser() oauthUser: OAuthUser, @Body() body: RegisterRequestDto, @Res() res: Response) {
+  async register(@GetUser() oauthUser: OAuthUser, @Body() body: RegisterRequest, @Res() res: Response) {
     const user = await this.authService.register(oauthUser, body);
     await this.setTokenCookies(user, res);
 
-    return res.send(user);
+    return res.send(new UserResponse(user));
   }
 
   private setCookie(res: Response, name: string, token: string, options: CookieOptions) {

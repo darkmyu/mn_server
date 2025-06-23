@@ -1,6 +1,6 @@
 import { IsNotEmpty, IsString } from 'class-validator';
 
-export class RegisterRequestDto {
+export class RegisterRequest {
   @IsString()
   @IsNotEmpty()
   nickname: string;

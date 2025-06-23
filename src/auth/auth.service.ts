@@ -3,7 +3,7 @@ import { PrismaService } from '@/prisma/prisma.service';
 import { ConflictException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-import { RegisterRequestDto } from './dto/register-request.dto';
+import { RegisterRequest } from './dto/register-request.dto';
 import { OAuthUser, TokenPayload } from './interface/auth.interface';
 
 @Injectable()
@@ -14,7 +14,7 @@ export class AuthService {
     private readonly configService: ConfigService<EnvironmentVariables, true>,
   ) {}
 
-  async register(oauthUser: OAuthUser, body: RegisterRequestDto) {
+  async register(oauthUser: OAuthUser, body: RegisterRequest) {
     const exists = await this.prisma.user.findFirst({
       where: {
         username: body.username,
