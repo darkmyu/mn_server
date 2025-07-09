@@ -14,10 +14,10 @@ export class AuthService {
     private readonly configService: ConfigService<EnvironmentVariables, true>,
   ) {}
 
-  async register(oauthUser: OAuthUser, body: RegisterRequest) {
+  async register(oauthUser: OAuthUser, request: RegisterRequest) {
     const exists = await this.prisma.user.findFirst({
       where: {
-        username: body.username,
+        username: request.username,
       },
     });
 
@@ -28,8 +28,8 @@ export class AuthService {
     const user = await this.prisma.user.create({
       data: {
         email: oauthUser.email,
-        nickname: body.nickname,
-        username: body.username,
+        nickname: request.nickname,
+        username: request.username,
         provider: oauthUser.provider,
         providerId: oauthUser.providerId,
         profileImage: oauthUser.profileImage,

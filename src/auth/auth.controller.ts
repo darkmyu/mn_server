@@ -56,8 +56,8 @@ export class AuthController {
   @Public()
   @Post('register')
   @UseGuards(AuthGuard('jwt-register'))
-  async register(@GetUser() oauthUser: OAuthUser, @Body() body: RegisterRequest, @Res() res: Response) {
-    const user = await this.authService.register(oauthUser, body);
+  async register(@GetUser() oauthUser: OAuthUser, @Body() request: RegisterRequest, @Res() res: Response) {
+    const user = await this.authService.register(oauthUser, request);
     await this.setTokenCookies(user, res);
 
     return res.send(new UserResponse(user));
