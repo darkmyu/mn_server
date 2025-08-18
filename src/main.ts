@@ -11,6 +11,10 @@ async function bootstrap() {
   app.setGlobalPrefix('/api/v1');
   app.use(cookieParser());
   app.useGlobalPipes(new ValidationPipe({ transform: true }));
+  app.enableCors({
+    origin: process.env.NODE_ENV === 'development' ? /localhost/ : /mntop.com/,
+    credentials: true,
+  });
 
   const config = new DocumentBuilder().build();
   const documentFactory = () => SwaggerModule.createDocument(app, config);

@@ -1,6 +1,6 @@
 import { User } from '@prisma/client';
 
-export class UserResponse {
+export class RegisterResponse {
   id: number;
   username: string;
   nickname: string;
