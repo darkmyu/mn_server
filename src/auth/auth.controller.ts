@@ -81,6 +81,8 @@ export class AuthController {
       username: user.username,
     });
 
+    res.clearCookie('register_token');
+
     this.setCookie(res, 'access_token', accessToken, {
       maxAge: 60 * 60 * 1000,
     });
