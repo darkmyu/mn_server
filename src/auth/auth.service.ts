@@ -15,15 +15,7 @@ export class AuthService {
   ) {}
 
   async register(oauthUser: OAuthUser, request: AuthRegisterRequest) {
-    const exists = await this.prisma.user.findFirst({
-      where: {
-        username: request.username,
-      },
-    });
-
-    if (exists) {
-      throw new ConflictException('User already exists');
-    }
+    await this.checkDuplicateUsername(request.username);
 
     const user = await this.prisma.user.create({
       data: {
@@ -78,5 +70,17 @@ export class AuthService {
     });
 
     return registerToken;
+  }
+
+  async checkDuplicateUsername(username: string) {
+    const exists = await this.prisma.user.findFirst({
+      where: {
+        username,
+      },
+    });
+
+    if (exists) {
+      throw new ConflictException('username already exists');
+    }
   }
 }

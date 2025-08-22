@@ -1,12 +1,13 @@
 import { AppConfigService } from '@/config/app-config.service';
 import { UserResponse } from '@/user/dto/user-response.dto';
-import { Body, Controller, Get, Post, Res, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, Post, Res, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { User } from '@prisma/client';
 import { CookieOptions, Response } from 'express';
 import { AuthService } from './auth.service';
 import { GetUser } from './decorator/get-user.decorator';
 import { Public } from './decorator/public.decorator';
+import { AuthCheckDuplicateUsernameRequest } from './dto/auth-check-duplicate-username-request.dto';
 import { AuthRegisterRequest } from './dto/auth-register-request.dto';
 import { OAuthUser } from './interface/auth.interface';
 
@@ -65,6 +66,13 @@ export class AuthController {
     await this.setTokenCookies(user, res);
 
     return new UserResponse(user);
+  }
+
+  @Public()
+  @HttpCode(200)
+  @Post('check-duplicate-username')
+  async checkDuplicateUsername(@Body() request: AuthCheckDuplicateUsernameRequest) {
+    await this.authService.checkDuplicateUsername(request.username);
   }
 
   private setCookie(res: Response, name: string, token: string, options: CookieOptions) {
