@@ -6,8 +6,10 @@ import { User } from '@prisma/client';
 import { CookieOptions, Response } from 'express';
 import { AuthService } from './auth.service';
 import { GetUser } from './decorator/get-user.decorator';
+import { IgnoreUnauthorized } from './decorator/ignore-unauthorized.decorator';
 import { Public } from './decorator/public.decorator';
 import { AuthCheckDuplicateUsernameRequest } from './dto/auth-check-duplicate-username-request.dto';
+import { AuthInfoResponse } from './dto/auth-info-response.dto';
 import { AuthRegisterRequest } from './dto/auth-register-request.dto';
 import { OAuthUser } from './interface/auth.interface';
 
@@ -17,6 +19,12 @@ export class AuthController {
     private readonly authService: AuthService,
     private readonly appConfigService: AppConfigService,
   ) {}
+
+  @Get('info')
+  @IgnoreUnauthorized()
+  info(@GetUser() user: User | null) {
+    return new AuthInfoResponse(!!user, user);
+  }
 
   @Public()
   @Get('google')
