@@ -49,18 +49,22 @@ export class AuthService {
     return user;
   }
 
-  async generateTokens(payload: TokenPayload) {
+  async generateAccessToken(payload: TokenPayload) {
     const accessToken = await this.jwtService.signAsync(payload, {
       expiresIn: this.configService.get('JWT_EXPIRES_IN', { infer: true }),
       secret: this.configService.get('JWT_SECRET', { infer: true }),
     });
 
+    return accessToken;
+  }
+
+  async generateRefreshToken(payload: TokenPayload) {
     const refreshToken = await this.jwtService.signAsync(payload, {
       expiresIn: this.configService.get('JWT_REFRESH_EXPIRES_IN', { infer: true }),
       secret: this.configService.get('JWT_REFRESH_SECRET', { infer: true }),
     });
 
-    return { accessToken, refreshToken };
+    return refreshToken;
   }
 
   async generateRegisterToken(payload: OAuthUser) {

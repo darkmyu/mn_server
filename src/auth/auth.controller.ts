@@ -35,7 +35,7 @@ export class AuthController {
   @Get('google/callback')
   @UseGuards(AuthGuard('google'))
   async googleCallback(@GetUser() user: User | OAuthUser, @Res() res: Response) {
-    return this.handleSocialCallback(user, res);
+    return this.socialCallback(user, res);
   }
 
   @Public()
@@ -47,7 +47,7 @@ export class AuthController {
   @Get('naver/callback')
   @UseGuards(AuthGuard('naver'))
   async naverCallback(@GetUser() user: User | OAuthUser, @Res() res: Response) {
-    return this.handleSocialCallback(user, res);
+    return this.socialCallback(user, res);
   }
 
   @Public()
@@ -59,7 +59,15 @@ export class AuthController {
   @Get('kakao/callback')
   @UseGuards(AuthGuard('kakao'))
   async kakaoCallback(@GetUser() user: User | OAuthUser, @Res() res: Response) {
-    return this.handleSocialCallback(user, res);
+    return this.socialCallback(user, res);
+  }
+
+  @Public()
+  @Get('refresh')
+  @UseGuards(AuthGuard('jwt-refresh'))
+  async refresh(@GetUser() user: User, @Res() res: Response) {
+    await this.setAccessTokenCookie(res, user);
+    return res.send();
   }
 
   @Public()
@@ -71,7 +79,7 @@ export class AuthController {
     @Res({ passthrough: true }) res: Response,
   ) {
     const user = await this.authService.register(oauthUser, request);
-    await this.setTokenCookies(user, res);
+    await this.setRefreshTokenCookie(res, user);
 
     return new UserResponse(user);
   }
@@ -83,6 +91,21 @@ export class AuthController {
     await this.authService.checkDuplicateUsername(request.username);
   }
 
+  private async socialCallback(user: User | OAuthUser, res: Response) {
+    const host = this.appConfigService.host;
+
+    if ('id' in user) {
+      await this.setAccessTokenCookie(res, user);
+      await this.setRefreshTokenCookie(res, user);
+
+      return res.redirect(host);
+    }
+
+    await this.setRegisterTokenCookie(res, user);
+
+    return res.redirect(`${host}/onboarding`);
+  }
+
   private setCookie(res: Response, name: string, token: string, options: CookieOptions) {
     res.cookie(name, token, {
       httpOnly: true,
@@ -91,16 +114,21 @@ export class AuthController {
     });
   }
 
-  private async setTokenCookies(user: User, res: Response) {
-    const { accessToken, refreshToken } = await this.authService.generateTokens({
+  private async setAccessTokenCookie(res: Response, user: User) {
+    const accessToken = await this.authService.generateAccessToken({
       id: user.id,
       username: user.username,
     });
 
-    res.clearCookie('register_token');
-
     this.setCookie(res, 'access_token', accessToken, {
       maxAge: 60 * 60 * 1000,
+    });
+  }
+
+  private async setRefreshTokenCookie(res: Response, user: User) {
+    const refreshToken = await this.authService.generateRefreshToken({
+      id: user.id,
+      username: user.username,
     });
 
     this.setCookie(res, 'refresh_token', refreshToken, {
@@ -108,20 +136,11 @@ export class AuthController {
     });
   }
 
-  private async handleSocialCallback(user: User | OAuthUser, res: Response) {
-    const host = this.appConfigService.host;
-
-    if ('id' in user) {
-      await this.setTokenCookies(user, res);
-      return res.redirect(host);
-    }
-
-    const registerToken = await this.authService.generateRegisterToken(user);
+  private async setRegisterTokenCookie(res: Response, oauthUser: OAuthUser) {
+    const registerToken = await this.authService.generateRegisterToken(oauthUser);
 
     this.setCookie(res, 'register_token', registerToken, {
       maxAge: 60 * 60 * 1000,
     });
-
-    return res.redirect(`${host}/onboarding`);
   }
 }
