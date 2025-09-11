@@ -3,10 +3,10 @@ import { User } from '@prisma/client';
 
 export class AuthInfoResponse {
   isAuthenticated: boolean;
-  user?: UserResponse;
+  user: UserResponse | null;
 
   constructor(isAuthenticated: boolean, user: User | null) {
     this.isAuthenticated = isAuthenticated;
-    this.user = user ? new UserResponse(user) : undefined;
+    this.user = user ? new UserResponse(user) : null;
   }
 }

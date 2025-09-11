@@ -91,6 +91,11 @@ export class AuthController {
     await this.authService.checkDuplicateUsername(request.username);
   }
 
+  @Post('logout')
+  logout(@Res() res: Response) {
+    return res.clearCookie('access_token').clearCookie('refresh_token').send();
+  }
+
   private async socialCallback(user: User | OAuthUser, res: Response) {
     const host = this.appConfigService.host;
 
