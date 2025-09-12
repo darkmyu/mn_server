@@ -25,10 +25,10 @@ model User {
   nickname     String
   username     String   @unique
   provider     Provider
-  providerId   String
-  profileImage String?
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  providerId   String   @map("provider_id")
+  profileImage String?  @map("profile_image")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
 
   @@map("users")
 }
