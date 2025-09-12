@@ -15,4 +15,16 @@ export class AppConfigService {
   get domain() {
     return this.configService.get('NODE_ENV', { infer: true }) === 'production' ? '.mntop.com' : 'localhost';
   }
+
+  get accessTokenMaxAge() {
+    return 60 * 60 * 1000;
+  }
+
+  get registerTokenMaxAge() {
+    return 60 * 60 * 1000;
+  }
+
+  get refreshTokenMaxAge() {
+    return 60 * 60 * 1000 * 24 * 7;
+  }
 }

@@ -63,14 +63,6 @@ export class AuthController {
   }
 
   @Public()
-  @Get('refresh')
-  @UseGuards(AuthGuard('jwt-refresh'))
-  async refresh(@GetUser() user: User, @Res() res: Response) {
-    await this.setAccessTokenCookie(res, user);
-    return res.send();
-  }
-
-  @Public()
   @Post('register')
   @UseGuards(AuthGuard('jwt-register'))
   async register(
@@ -126,7 +118,7 @@ export class AuthController {
     });
 
     this.setCookie(res, 'access_token', accessToken, {
-      maxAge: 60 * 60 * 1000,
+      maxAge: this.appConfigService.accessTokenMaxAge,
     });
   }
 
@@ -137,7 +129,7 @@ export class AuthController {
     });
 
     this.setCookie(res, 'refresh_token', refreshToken, {
-      maxAge: 60 * 60 * 1000 * 24 * 7,
+      maxAge: this.appConfigService.refreshTokenMaxAge,
     });
   }
 
@@ -145,7 +137,7 @@ export class AuthController {
     const registerToken = await this.authService.generateRegisterToken(oauthUser);
 
     this.setCookie(res, 'register_token', registerToken, {
-      maxAge: 60 * 60 * 1000,
+      maxAge: this.appConfigService.registerTokenMaxAge,
     });
   }
 }
