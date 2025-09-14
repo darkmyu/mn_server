@@ -28,7 +28,7 @@ model User {
   providerId   String   @map("provider_id")
   profileImage String?  @map("profile_image")
   createdAt    DateTime @default(now()) @map("created_at")
-  updatedAt    DateTime @updatedAt @map("updated_at")
+  updatedAt    DateTime @default(now()) @updatedAt @map("updated_at")
 
   @@map("users")
 }
