@@ -71,6 +71,8 @@ export class AuthController {
     @Res({ passthrough: true }) res: Response,
   ) {
     const user = await this.authService.register(oauthUser, request);
+
+    res.clearCookie('register_token');
     await this.setAccessTokenCookie(res, user);
     await this.setRefreshTokenCookie(res, user);
 
