@@ -19,6 +19,16 @@ enum Provider {
   KAKAO
 }
 
+enum Species {
+  DOG
+  CAT
+}
+
+enum Gender {
+  MALE
+  FEMALE
+}
+
 model User {
   id           Int      @id @default(autoincrement())
   email        String?
@@ -30,5 +40,38 @@ model User {
   createdAt    DateTime @default(now()) @map("created_at")
   updatedAt    DateTime @default(now()) @updatedAt @map("updated_at")
 
+  animals Animal[]
+
   @@map("users")
+}
+
+model Animal {
+  id      Int @id @default(autoincrement())
+  userId  Int @map("user_id")
+  breedId Int @map("breed_id")
+
+  name      String
+  species   Species
+  gender    Gender
+  birthday  DateTime?
+  age       Int
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @default(now()) @updatedAt @map("updated_at")
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  breed Breed @relation(fields: [breedId], references: [id])
+
+  @@map("animals")
+}
+
+model Breed {
+  id        Int      @id @default(autoincrement())
+  name      String
+  species   Species
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+
+  animals Animal[]
+
+  @@map("breeds")
 }
