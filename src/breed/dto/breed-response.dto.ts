@@ -1,0 +1,13 @@
+import { Breed, Species } from '@prisma/client';
+
+export class BreedResponse {
+  id: number;
+  name: string;
+  species: Species;
+
+  constructor(breed: Breed) {
+    this.id = breed.id;
+    this.name = breed.name;
+    this.species = breed.species;
+  }
+}

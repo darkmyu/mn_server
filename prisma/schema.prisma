@@ -51,7 +51,7 @@ model Animal {
   breedId Int @map("breed_id")
 
   name      String
-  species   Species
+  picture   String?
   gender    Gender
   birthday  DateTime?
   age       Int
