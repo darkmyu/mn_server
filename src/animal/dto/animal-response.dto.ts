@@ -7,7 +7,6 @@ export class AnimalResponse {
   name: string;
   gender: Gender;
   birthday: Date | null;
-  age: number;
   user: UserResponse;
   breed: BreedResponse;
 
@@ -16,7 +15,6 @@ export class AnimalResponse {
     this.name = animal.name;
     this.gender = animal.gender;
     this.birthday = animal.birthday;
-    this.age = animal.age;
     this.user = new UserResponse(animal.user);
     this.breed = new BreedResponse(animal.breed);
   }

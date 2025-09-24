@@ -1,5 +1,5 @@
 import { Gender } from '@prisma/client';
-import { IsDateString, IsEnum, IsInt, IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsDateString, IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class AnimalCreateRequest {
   @IsNumber()
@@ -21,8 +21,4 @@ export class AnimalCreateRequest {
   @IsDateString()
   @IsOptional()
   birthday?: string;
-
-  @IsInt()
-  @IsOptional()
-  age: number;
 }
