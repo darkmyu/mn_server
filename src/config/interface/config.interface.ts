@@ -17,4 +17,10 @@ export interface EnvironmentVariables {
   KAKAO_CLIENT_ID: string;
   KAKAO_CLIENT_SECRET: string;
   KAKAO_CALLBACK_URL: string;
+  R2_URL: string;
+  R2_REGION: string;
+  R2_BUCKET: string;
+  R2_ENDPOINT: string;
+  R2_ACCESS_KEY: string;
+  R2_SECRET_KEY: string;
 }
