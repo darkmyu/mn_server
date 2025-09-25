@@ -1,12 +1,18 @@
 import { BreedResponse } from '@/breed/dto/breed-response.dto';
 import { FileResponse } from '@/file/dto/file-response.dto';
 import { UserResponse } from '@/user/dto/user-response.dto';
+import { ApiProperty } from '@nestjs/swagger';
 import { Gender, Prisma } from '@prisma/client';
 
 export class AnimalResponse {
   id: number;
   name: string;
+
+  @ApiProperty({
+    enum: Gender,
+  })
   gender: Gender;
+
   birthday: Date | null;
   user: UserResponse;
   breed: BreedResponse;

@@ -1,3 +1,4 @@
+import { ApiProperty } from '@nestjs/swagger';
 import { Gender } from '@prisma/client';
 import { IsDateString, IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
 
@@ -10,6 +11,9 @@ export class AnimalCreateRequest {
   @IsNotEmpty()
   name: string;
 
+  @ApiProperty({
+    enum: Gender,
+  })
   @IsEnum(Gender)
   @IsNotEmpty()
   gender: Gender;

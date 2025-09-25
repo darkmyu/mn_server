@@ -1,8 +1,13 @@
+import { ApiProperty } from '@nestjs/swagger';
 import { Breed, Species } from '@prisma/client';
 
 export class BreedResponse {
   id: number;
   name: string;
+
+  @ApiProperty({
+    enum: Species,
+  })
   species: Species;
 
   constructor(breed: Breed) {
