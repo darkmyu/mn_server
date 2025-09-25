@@ -2,12 +2,12 @@ import { EnvironmentVariables } from '@/config/interface/config.interface';
 import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import * as dayjs from 'dayjs';
 import { nanoid } from 'nanoid';
 import { FileResponse } from './dto/file-response.dto';
 
 interface KeyParams {
-  prefix: 'animals';
-  userId: number;
+  prefix: 'thumbnails';
   file: Express.Multer.File;
 }
 
@@ -43,9 +43,10 @@ export class FileService {
     return new FileResponse(`${this.R2_URL}/${key}`);
   }
 
-  generateKey({ prefix, userId, file }: KeyParams) {
+  generateKey({ prefix, file }: KeyParams) {
+    const date = dayjs().format('YYYY-MM-DD');
     const filename = Buffer.from(file.originalname, 'latin1').toString('utf8');
 
-    return `${prefix}/${userId}/${nanoid()}/${filename}`;
+    return `${prefix}/${date}/${nanoid()}/${filename}`;
   }
 }

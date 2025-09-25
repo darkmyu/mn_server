@@ -85,7 +85,12 @@ export class AnimalService {
       include: {
         user: true,
         breed: true,
-        thumbnails: true,
+        thumbnails: {
+          take: 1,
+          orderBy: {
+            id: 'desc',
+          },
+        },
       },
     });
 
@@ -114,15 +119,20 @@ export class AnimalService {
       include: {
         user: true,
         breed: true,
-        thumbnails: true,
+        thumbnails: {
+          take: 1,
+          orderBy: {
+            id: 'desc',
+          },
+        },
       },
     });
 
     return new AnimalResponse(deletedAnimal);
   }
 
-  async upload(user: User, thumbnail: Express.Multer.File) {
-    const key = this.fileService.generateKey({ prefix: 'animals', userId: user.id, file: thumbnail });
+  async upload(thumbnail: Express.Multer.File) {
+    const key = this.fileService.generateKey({ prefix: 'thumbnails', file: thumbnail });
 
     return this.fileService.upload(key, thumbnail);
   }

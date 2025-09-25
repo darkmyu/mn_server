@@ -10,7 +10,7 @@ export class AnimalResponse {
   birthday: Date | null;
   user: UserResponse;
   breed: BreedResponse;
-  thumbnails: FileResponse[];
+  thumbnail: FileResponse | null;
 
   constructor(animal: Prisma.AnimalGetPayload<{ include: { user: true; breed: true; thumbnails: true } }>) {
     this.id = animal.id;
@@ -19,6 +19,6 @@ export class AnimalResponse {
     this.birthday = animal.birthday;
     this.user = new UserResponse(animal.user);
     this.breed = new BreedResponse(animal.breed);
-    this.thumbnails = animal.thumbnails.map((thumbnail) => new FileResponse(thumbnail.path));
+    this.thumbnail = animal.thumbnails.length > 0 ? new FileResponse(animal.thumbnails[0].path) : null;
   }
 }

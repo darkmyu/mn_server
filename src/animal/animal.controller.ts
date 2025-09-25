@@ -40,7 +40,6 @@ export class AnimalController {
   @Post('thumbnail')
   @UseInterceptors(FileInterceptor('thumbnail'))
   async upload(
-    @GetUser() user: User,
     @UploadedFile(
       new ParseFilePipe({
         validators: [
@@ -51,6 +50,6 @@ export class AnimalController {
     )
     thumbnail: Express.Multer.File,
   ) {
-    return this.animalService.upload(user, thumbnail);
+    return this.animalService.upload(thumbnail);
   }
 }
