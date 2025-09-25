@@ -51,14 +51,14 @@ model Animal {
   breedId Int @map("breed_id")
 
   name      String
-  picture   String?
   gender    Gender
   birthday  DateTime?
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime  @default(now()) @updatedAt @map("updated_at")
 
-  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
-  breed Breed @relation(fields: [breedId], references: [id])
+  user       User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  breed      Breed             @relation(fields: [breedId], references: [id])
+  thumbnails AnimalThumbnail[]
 
   @@map("animals")
 }
@@ -73,4 +73,17 @@ model Breed {
   animals Animal[]
 
   @@map("breeds")
+}
+
+model AnimalThumbnail {
+  id       Int @id @default(autoincrement())
+  animalId Int @map("animal_id")
+
+  path      String
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+
+  animal Animal @relation(fields: [animalId], references: [id], onDelete: Cascade)
+
+  @@map("animal_thumbnails")
 }

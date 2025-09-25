@@ -1,13 +1,13 @@
 import { EnvironmentVariables } from '@/config/interface/config.interface';
 import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import mime from 'mime';
 import { nanoid } from 'nanoid';
+import { FileResponse } from './dto/file-response.dto';
 
 interface KeyParams {
   prefix: 'animals';
-  entityId: number;
+  userId: number;
   file: Express.Multer.File;
 }
 
@@ -40,15 +40,12 @@ export class FileService {
       }),
     );
 
-    return `${this.R2_URL}/${key}`;
+    return new FileResponse(`${this.R2_URL}/${key}`);
   }
 
-  generateKey({ prefix, entityId, file }: KeyParams) {
-    const extension = mime.getExtension(file.mimetype);
-    if (!extension) {
-      throw new BadRequestException('unsupported file type');
-    }
+  generateKey({ prefix, userId, file }: KeyParams) {
+    const filename = Buffer.from(file.originalname, 'latin1').toString('utf8');
 
-    return `${prefix}/${entityId}/${nanoid()}.${extension}`;
+    return `${prefix}/${userId}/${nanoid()}/${filename}`;
   }
 }

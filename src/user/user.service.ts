@@ -31,6 +31,7 @@ export class UserService {
           include: {
             user: true,
             breed: true,
+            thumbnails: true,
           },
         },
       },

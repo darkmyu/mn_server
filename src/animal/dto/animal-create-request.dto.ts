@@ -10,10 +10,6 @@ export class AnimalCreateRequest {
   @IsNotEmpty()
   name: string;
 
-  @IsString()
-  @IsOptional()
-  picture?: string;
-
   @IsEnum(Gender)
   @IsNotEmpty()
   gender: Gender;
@@ -21,4 +17,8 @@ export class AnimalCreateRequest {
   @IsDateString()
   @IsOptional()
   birthday?: string;
+
+  @IsString()
+  @IsOptional()
+  thumbnail?: string;
 }

@@ -19,13 +19,20 @@ export class AnimalService {
         userId: user.id,
         breedId: request.breedId,
         name: request.name,
-        picture: request.picture,
         gender: request.gender,
         ...(request.birthday && { birthday: new Date(request.birthday) }),
+        ...(request.thumbnail && {
+          thumbnails: {
+            create: {
+              path: request.thumbnail,
+            },
+          },
+        }),
       },
       include: {
         user: true,
         breed: true,
+        thumbnails: true,
       },
     });
 
@@ -37,6 +44,14 @@ export class AnimalService {
       where: {
         id,
       },
+      include: {
+        thumbnails: {
+          take: 1,
+          orderBy: {
+            id: 'desc',
+          },
+        },
+      },
     });
 
     if (!animal) {
@@ -47,17 +62,30 @@ export class AnimalService {
       throw new UnauthorizedException('you are not the owner fo this animal');
     }
 
+    const currentThumbnail = animal.thumbnails.length > 0 ? animal.thumbnails[0].path : null;
+
     const updatedAnimal = await this.prisma.animal.update({
       where: {
         id,
       },
       data: {
-        ...request,
+        breedId: request.breedId,
+        name: request.name,
+        gender: request.gender,
         ...(request.birthday && { birthday: new Date(request.birthday) }),
+        ...(request.thumbnail &&
+          request.thumbnail !== currentThumbnail && {
+            thumbnails: {
+              create: {
+                path: request.thumbnail,
+              },
+            },
+          }),
       },
       include: {
         user: true,
         breed: true,
+        thumbnails: true,
       },
     });
 
@@ -86,16 +114,16 @@ export class AnimalService {
       include: {
         user: true,
         breed: true,
+        thumbnails: true,
       },
     });
 
     return new AnimalResponse(deletedAnimal);
   }
 
-  async upload(user: User, image: Express.Multer.File) {
-    const key = this.fileService.generateKey({ prefix: 'animals', entityId: user.id, file: image });
-    const path = await this.fileService.upload(key, image);
+  async upload(user: User, thumbnail: Express.Multer.File) {
+    const key = this.fileService.generateKey({ prefix: 'animals', userId: user.id, file: thumbnail });
 
-    return path;
+    return this.fileService.upload(key, thumbnail);
   }
 }

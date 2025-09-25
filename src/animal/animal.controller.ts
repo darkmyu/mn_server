@@ -37,8 +37,8 @@ export class AnimalController {
     return this.animalService.delete(id, user);
   }
 
-  @Post('image')
-  @UseInterceptors(FileInterceptor('image'))
+  @Post('thumbnail')
+  @UseInterceptors(FileInterceptor('thumbnail'))
   async upload(
     @GetUser() user: User,
     @UploadedFile(
@@ -49,8 +49,8 @@ export class AnimalController {
         ],
       }),
     )
-    image: Express.Multer.File,
+    thumbnail: Express.Multer.File,
   ) {
-    return this.animalService.upload(user, image);
+    return this.animalService.upload(user, thumbnail);
   }
 }
