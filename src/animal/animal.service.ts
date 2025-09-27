@@ -20,19 +20,12 @@ export class AnimalService {
         breedId: request.breedId,
         name: request.name,
         gender: request.gender,
+        thumbnail: request.thumbnail,
         ...(request.birthday && { birthday: new Date(request.birthday) }),
-        ...(request.thumbnail && {
-          thumbnails: {
-            create: {
-              path: request.thumbnail,
-            },
-          },
-        }),
       },
       include: {
         user: true,
         breed: true,
-        thumbnails: true,
       },
     });
 
@@ -44,14 +37,6 @@ export class AnimalService {
       where: {
         id,
       },
-      include: {
-        thumbnails: {
-          take: 1,
-          orderBy: {
-            id: 'desc',
-          },
-        },
-      },
     });
 
     if (!animal) {
@@ -62,8 +47,6 @@ export class AnimalService {
       throw new UnauthorizedException('you are not the owner fo this animal');
     }
 
-    const currentThumbnail = animal.thumbnails.length > 0 ? animal.thumbnails[0].path : null;
-
     const updatedAnimal = await this.prisma.animal.update({
       where: {
         id,
@@ -72,25 +55,12 @@ export class AnimalService {
         breedId: request.breedId,
         name: request.name,
         gender: request.gender,
+        thumbnail: request.thumbnail,
         ...(request.birthday && { birthday: new Date(request.birthday) }),
-        ...(request.thumbnail &&
-          request.thumbnail !== currentThumbnail && {
-            thumbnails: {
-              create: {
-                path: request.thumbnail,
-              },
-            },
-          }),
       },
       include: {
         user: true,
         breed: true,
-        thumbnails: {
-          take: 1,
-          orderBy: {
-            id: 'desc',
-          },
-        },
       },
     });
 
@@ -119,12 +89,6 @@ export class AnimalService {
       include: {
         user: true,
         breed: true,
-        thumbnails: {
-          take: 1,
-          orderBy: {
-            id: 'desc',
-          },
-        },
       },
     });
 
