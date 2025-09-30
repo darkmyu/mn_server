@@ -2,6 +2,7 @@ import { AppConfigService } from '@/config/app-config.service';
 import { UserResponse } from '@/user/dto/user-response.dto';
 import { Body, Controller, Get, HttpCode, Post, Res, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
+import { ApiOkResponse } from '@nestjs/swagger';
 import { User } from '@prisma/client';
 import { CookieOptions, Response } from 'express';
 import { AuthService } from './auth.service';
@@ -20,6 +21,9 @@ export class AuthController {
     private readonly appConfigService: AppConfigService,
   ) {}
 
+  @ApiOkResponse({
+    type: AuthInfoResponse,
+  })
   @Get('info')
   @IgnoreUnauthorized()
   info(@GetUser() user: User | null) {
@@ -62,6 +66,9 @@ export class AuthController {
     return this.socialCallback(user, res);
   }
 
+  @ApiOkResponse({
+    type: UserResponse,
+  })
   @Public()
   @Post('register')
   @UseGuards(AuthGuard('jwt-register'))

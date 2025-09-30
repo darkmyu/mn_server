@@ -4,7 +4,10 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Gender, Prisma } from '@prisma/client';
 
 export class AnimalResponse {
+  @ApiProperty()
   id: number;
+
+  @ApiProperty()
   name: string;
 
   @ApiProperty({
@@ -12,9 +15,22 @@ export class AnimalResponse {
   })
   gender: Gender;
 
+  @ApiProperty({
+    type: Date,
+    nullable: true,
+  })
   birthday: Date | null;
+
+  @ApiProperty({
+    type: 'string',
+    nullable: true,
+  })
   thumbnail: string | null;
+
+  @ApiProperty()
   user: UserResponse;
+
+  @ApiProperty()
   breed: BreedResponse;
 
   constructor(animal: Prisma.AnimalGetPayload<{ include: { user: true; breed: true } }>) {

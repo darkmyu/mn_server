@@ -1,12 +1,18 @@
 import { ApiProperty } from '@nestjs/swagger';
 
 export class Pagination<T> {
-  @ApiProperty()
   items: T[];
 
+  @ApiProperty()
   page: number;
+
+  @ApiProperty()
   total: number;
+
+  @ApiProperty()
   limit: number;
+
+  @ApiProperty()
   isLast: boolean;
 
   constructor(items: T[], page: number, total: number, limit: number, isLast: boolean) {
