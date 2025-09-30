@@ -1,4 +1,6 @@
+import { AnimalResponse } from '@/animal/dto/animal-response.dto';
 import { Public } from '@/auth/decorator/public.decorator';
+import { ApiOkResponsePagination } from '@/common/decorator/api-ok-response-pagination.dto';
 import { Controller, Get, Param } from '@nestjs/common';
 import { UserService } from './user.service';
 
@@ -13,6 +15,7 @@ export class UserController {
   }
 
   @Public()
+  @ApiOkResponsePagination(AnimalResponse)
   @Get(':username/animals')
   async animals(@Param('username') username: string) {
     return this.userService.animals(username);
