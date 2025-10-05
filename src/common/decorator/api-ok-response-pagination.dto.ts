@@ -16,6 +16,7 @@ export const ApiOkResponsePagination = <T extends Type<unknown>>(type: T) => {
                 items: { $ref: getSchemaPath(type) },
               },
             },
+            required: ['items'],
           },
         ],
       },
