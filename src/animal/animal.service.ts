@@ -21,7 +21,7 @@ export class AnimalService {
         name: request.name,
         gender: request.gender,
         thumbnail: request.thumbnail,
-        ...(request.birthday && { birthday: new Date(request.birthday) }),
+        birthday: request.birthday,
       },
       include: {
         user: true,
@@ -56,7 +56,7 @@ export class AnimalService {
         name: request.name,
         gender: request.gender,
         thumbnail: request.thumbnail,
-        ...(request.birthday && { birthday: new Date(request.birthday) }),
+        birthday: request.birthday,
       },
       include: {
         user: true,
