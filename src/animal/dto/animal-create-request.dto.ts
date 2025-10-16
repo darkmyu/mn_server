@@ -20,10 +20,10 @@ export class AnimalCreateRequest {
   @IsNotEmpty()
   gender: Gender;
 
-  @ApiPropertyOptional()
+  @ApiProperty()
   @IsDateString()
-  @IsOptional()
-  birthday?: Date;
+  @IsNotEmpty()
+  birthday: Date;
 
   @ApiPropertyOptional()
   @IsString()

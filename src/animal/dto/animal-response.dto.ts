@@ -17,9 +17,8 @@ export class AnimalResponse {
 
   @ApiProperty({
     type: Date,
-    nullable: true,
   })
-  birthday: Date | null;
+  birthday: Date;
 
   @ApiProperty({
     type: 'string',

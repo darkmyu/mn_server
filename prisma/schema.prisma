@@ -52,10 +52,10 @@ model Animal {
 
   name      String
   gender    Gender
-  birthday  DateTime?
+  birthday  DateTime
   thumbnail String?
-  createdAt DateTime  @default(now()) @map("created_at")
-  updatedAt DateTime  @default(now()) @updatedAt @map("updated_at")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
 
   user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
   breed Breed @relation(fields: [breedId], references: [id])
