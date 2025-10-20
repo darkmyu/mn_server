@@ -8,8 +8,8 @@ import {
   MaxFileSizeValidator,
   Param,
   ParseFilePipe,
-  Patch,
   Post,
+  Put,
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
@@ -36,7 +36,7 @@ export class AnimalController {
   @ApiOkResponse({
     type: AnimalResponse,
   })
-  @Patch(':id')
+  @Put(':id')
   async update(@Param('id') id: number, @GetUser() user: User, @Body() request: AnimalUpdateRequest) {
     return this.animalService.update(id, user, request);
   }
