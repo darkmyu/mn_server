@@ -62,6 +62,7 @@ export class AnimalController {
           format: 'binary',
         },
       },
+      required: ['thumbnail'],
     },
   })
   @Post('thumbnail')
