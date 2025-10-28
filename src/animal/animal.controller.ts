@@ -5,6 +5,7 @@ import {
   Controller,
   Delete,
   FileTypeValidator,
+  Get,
   MaxFileSizeValidator,
   Param,
   ParseFilePipe,
@@ -24,6 +25,14 @@ import { AnimalUpdateRequest } from './dto/animal-update-request.dto';
 @Controller('animals')
 export class AnimalController {
   constructor(private readonly animalService: AnimalService) {}
+
+  @ApiOkResponse({
+    type: AnimalResponse,
+  })
+  @Get(':id')
+  async read(@Param('id') id: number, @GetUser() user: User) {
+    return this.animalService.read(id, user);
+  }
 
   @ApiCreatedResponse({
     type: AnimalResponse,

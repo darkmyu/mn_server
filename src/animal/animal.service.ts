@@ -13,6 +13,28 @@ export class AnimalService {
     private readonly fileService: FileService,
   ) {}
 
+  async read(id: number, user: User) {
+    const animal = await this.prisma.animal.findUnique({
+      where: {
+        id,
+      },
+      include: {
+        user: true,
+        breed: true,
+      },
+    });
+
+    if (!animal) {
+      throw new NotFoundException('animal is not found');
+    }
+
+    if (animal.userId !== user.id) {
+      throw new UnauthorizedException('you are not the owner fo this animal');
+    }
+
+    return new AnimalResponse(animal);
+  }
+
   async create(user: User, request: AnimalCreateRequest) {
     const animal = await this.prisma.animal.create({
       data: {
