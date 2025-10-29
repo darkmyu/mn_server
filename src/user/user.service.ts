@@ -33,6 +33,9 @@ export class UserService {
             user: true,
             breed: true,
           },
+          orderBy: {
+            createdAt: 'asc',
+          },
         },
       },
     });
