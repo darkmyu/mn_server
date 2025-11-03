@@ -41,6 +41,7 @@ model User {
   updatedAt    DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz()
 
   animals Animal[]
+  photos  Photo[]
 
   @@map("users")
 }
@@ -60,6 +61,8 @@ model Animal {
   user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
   breed Breed @relation(fields: [breedId], references: [id])
 
+  photos Photo[]
+
   @@map("animals")
 }
 
@@ -73,4 +76,32 @@ model Breed {
   animals Animal[]
 
   @@map("breeds")
+}
+
+model Photo {
+  id       Int @id @default(autoincrement())
+  userId   Int @map("user_id")
+  animalId Int @map("animal_id")
+
+  title       String?
+  description String?
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt   DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz()
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  animal Animal @relation(fields: [animalId], references: [id], onDelete: Cascade)
+
+  tags PhotoTag[]
+
+  @@map("photos")
+}
+
+model PhotoTag {
+  id Int @id @default(autoincrement())
+
+  name String @unique
+
+  photos Photo[]
+
+  @@map("photo_tags")
 }
