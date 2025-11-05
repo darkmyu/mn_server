@@ -82,6 +82,7 @@ model Tag {
   id Int @id @default(autoincrement())
 
   name      String   @unique
+  slug      String   @unique
   createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz()
   updatedAt DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz()
 
@@ -95,6 +96,7 @@ model Photo {
   userId   Int @map("user_id")
   animalId Int @map("animal_id")
 
+  url         String
   title       String?
   description String?
   createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz()

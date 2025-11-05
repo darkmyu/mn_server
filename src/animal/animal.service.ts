@@ -29,7 +29,7 @@ export class AnimalService {
     }
 
     if (animal.userId !== user.id) {
-      throw new UnauthorizedException('you are not the owner fo this animal');
+      throw new UnauthorizedException('you are not the owner of this animal');
     }
 
     return new AnimalResponse(animal);
@@ -66,7 +66,7 @@ export class AnimalService {
     }
 
     if (animal.userId !== user.id) {
-      throw new UnauthorizedException('you are not the owner fo this animal');
+      throw new UnauthorizedException('you are not the owner of this animal');
     }
 
     const updatedAnimal = await this.prisma.animal.update({
@@ -101,7 +101,7 @@ export class AnimalService {
     }
 
     if (animal.userId !== user.id) {
-      throw new UnauthorizedException('you are not the owner fo this animal');
+      throw new UnauthorizedException('you are not the owner of this animal');
     }
 
     const deletedAnimal = await this.prisma.animal.delete({
