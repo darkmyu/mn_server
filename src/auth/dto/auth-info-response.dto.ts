@@ -1,19 +1,23 @@
+import { AnimalResponse } from '@/animal/dto/animal-response.dto';
 import { UserResponse } from '@/user/dto/user-response.dto';
 import { ApiProperty } from '@nestjs/swagger';
-import { User } from '@prisma/client';
+import { Prisma, User } from '@prisma/client';
 
 export class AuthInfoResponse {
-  @ApiProperty()
-  isAuthenticated: boolean;
-
   @ApiProperty({
-    type: UserResponse,
     nullable: true,
+    type: UserResponse,
   })
   user: UserResponse | null;
 
-  constructor(isAuthenticated: boolean, user: User | null) {
-    this.isAuthenticated = isAuthenticated;
+  @ApiProperty({
+    isArray: true,
+    type: AnimalResponse,
+  })
+  animals: AnimalResponse[];
+
+  constructor(user: User | null, animals: Prisma.AnimalGetPayload<{ include: { user: true; breed: true } }>[]) {
     this.user = user ? new UserResponse(user) : null;
+    this.animals = animals.map((animal) => new AnimalResponse(animal));
   }
 }

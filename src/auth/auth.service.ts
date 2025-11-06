@@ -3,6 +3,8 @@ import { PrismaService } from '@/prisma/prisma.service';
 import { ConflictException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
+import { User } from '@prisma/client';
+import { AuthInfoResponse } from './dto/auth-info-response.dto';
 import { AuthRegisterRequest } from './dto/auth-register-request.dto';
 import { OAuthUser, TokenPayload } from './interface/auth.interface';
 
@@ -13,6 +15,23 @@ export class AuthService {
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService<EnvironmentVariables, true>,
   ) {}
+
+  async info(user: User | null) {
+    const animals = await this.prisma.animal.findMany({
+      where: {
+        userId: user?.id,
+      },
+      include: {
+        user: true,
+        breed: true,
+      },
+      orderBy: {
+        createdAt: 'asc',
+      },
+    });
+
+    return new AuthInfoResponse(user, animals);
+  }
 
   async register(oauthUser: OAuthUser, request: AuthRegisterRequest) {
     await this.checkDuplicateUsername(request.username);

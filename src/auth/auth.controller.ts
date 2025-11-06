@@ -27,7 +27,7 @@ export class AuthController {
   @Get('info')
   @IgnoreUnauthorized()
   info(@GetUser() user: User | null) {
-    return new AuthInfoResponse(!!user, user);
+    return this.authService.info(user);
   }
 
   @Public()
