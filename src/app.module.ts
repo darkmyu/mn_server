@@ -8,10 +8,19 @@ import { AppConfigModule } from './config/app-config.module';
 import { FileModule } from './file/file.module';
 import { PhotoModule } from './photo/photo.module';
 import { PrismaModule } from './prisma/prisma.module';
-import { UserModule } from './user/user.module';
+import { ProfileModule } from './profile/profile.module';
 
 @Module({
-  imports: [AppConfigModule, PrismaModule, FileModule, AuthModule, AnimalModule, UserModule, BreedModule, PhotoModule],
+  imports: [
+    AppConfigModule,
+    PrismaModule,
+    FileModule,
+    AuthModule,
+    AnimalModule,
+    ProfileModule,
+    BreedModule,
+    PhotoModule,
+  ],
   providers: [
     {
       provide: APP_GUARD,

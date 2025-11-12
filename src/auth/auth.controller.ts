@@ -1,5 +1,5 @@
 import { AppConfigService } from '@/config/app-config.service';
-import { UserResponse } from '@/user/dto/user-response.dto';
+import { ProfileResponse } from '@/profile/dto/profile-response.dto';
 import { Body, Controller, Get, HttpCode, Post, Res, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiOkResponse } from '@nestjs/swagger';
@@ -67,7 +67,7 @@ export class AuthController {
   }
 
   @ApiOkResponse({
-    type: UserResponse,
+    type: ProfileResponse,
   })
   @Public()
   @Post('register')
@@ -83,7 +83,7 @@ export class AuthController {
     await this.setAccessTokenCookie(res, user);
     await this.setRefreshTokenCookie(res, user);
 
-    return new UserResponse(user);
+    return new ProfileResponse(user);
   }
 
   @Public()

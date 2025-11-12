@@ -3,26 +3,26 @@ import { Public } from '@/auth/decorator/public.decorator';
 import { ApiOkResponsePagination } from '@/common/decorator/api-ok-response-pagination.dto';
 import { Controller, Get, Param } from '@nestjs/common';
 import { ApiOkResponse } from '@nestjs/swagger';
-import { UserResponse } from './dto/user-response.dto';
-import { UserService } from './user.service';
+import { ProfileResponse } from './dto/profile-response.dto';
+import { ProfileService } from './profile.service';
 
-@Controller('users')
-export class UserController {
-  constructor(private readonly userService: UserService) {}
+@Controller('profiles')
+export class ProfileController {
+  constructor(private readonly profileService: ProfileService) {}
 
   @ApiOkResponse({
-    type: UserResponse,
+    type: ProfileResponse,
   })
   @Public()
   @Get(':username')
   async read(@Param('username') username: string) {
-    return this.userService.read(username);
+    return this.profileService.read(username);
   }
 
   @ApiOkResponsePagination(AnimalResponse)
   @Public()
   @Get(':username/animals')
   async animals(@Param('username') username: string) {
-    return this.userService.animals(username);
+    return this.profileService.animals(username);
   }
 }

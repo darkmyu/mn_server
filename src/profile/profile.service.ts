@@ -2,10 +2,10 @@ import { AnimalResponse } from '@/animal/dto/animal-response.dto';
 import { Pagination } from '@/common/dto/pagination.dto';
 import { PrismaService } from '@/prisma/prisma.service';
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { UserResponse } from './dto/user-response.dto';
+import { ProfileResponse } from './dto/profile-response.dto';
 
 @Injectable()
-export class UserService {
+export class ProfileService {
   constructor(private readonly prisma: PrismaService) {}
 
   async read(username: string) {
@@ -19,7 +19,7 @@ export class UserService {
       throw new NotFoundException('user is not found');
     }
 
-    return new UserResponse(user);
+    return new ProfileResponse(user);
   }
 
   async animals(username: string) {

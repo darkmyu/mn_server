@@ -1,6 +1,6 @@
 import { AnimalResponse } from '@/animal/dto/animal-response.dto';
+import { ProfileResponse } from '@/profile/dto/profile-response.dto';
 import { TagResponse } from '@/tag/dto/tag-response.dto';
-import { UserResponse } from '@/user/dto/user-response.dto';
 import { ApiProperty } from '@nestjs/swagger';
 import { Prisma } from '@prisma/client';
 
@@ -30,7 +30,7 @@ export class PhotoResponse {
   tags: TagResponse[];
 
   @ApiProperty()
-  user: UserResponse;
+  author: ProfileResponse;
 
   @ApiProperty()
   animal: AnimalResponse;
@@ -58,7 +58,7 @@ export class PhotoResponse {
     this.title = photo.title;
     this.description = photo.description;
     this.tags = photo.tags.map(({ tag }) => new TagResponse(tag));
-    this.user = new UserResponse(photo.user);
+    this.author = new ProfileResponse(photo.user);
     this.animal = new AnimalResponse(photo.animal);
   }
 }
