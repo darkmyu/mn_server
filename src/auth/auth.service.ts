@@ -16,21 +16,8 @@ export class AuthService {
     private readonly configService: ConfigService<EnvironmentVariables, true>,
   ) {}
 
-  async info(user: User | null) {
-    const animals = await this.prisma.animal.findMany({
-      where: {
-        userId: user?.id,
-      },
-      include: {
-        user: true,
-        breed: true,
-      },
-      orderBy: {
-        createdAt: 'asc',
-      },
-    });
-
-    return new AuthInfoResponse(user, animals);
+  info(user: User | null) {
+    return new AuthInfoResponse(user);
   }
 
   async register(oauthUser: OAuthUser, request: AuthRegisterRequest) {
