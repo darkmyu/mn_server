@@ -1,3 +1,4 @@
+import { Pagination } from '@/common/dto/pagination.dto';
 import { FileService } from '@/file/file.service';
 import { PrismaService } from '@/prisma/prisma.service';
 import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
@@ -12,6 +13,24 @@ export class AnimalService {
     private readonly prisma: PrismaService,
     private readonly fileService: FileService,
   ) {}
+
+  async all(user: User) {
+    const raws = await this.prisma.animal.findMany({
+      where: {
+        userId: user.id,
+      },
+      include: {
+        user: true,
+        breed: true,
+      },
+      orderBy: {
+        createdAt: 'asc',
+      },
+    });
+
+    const animals = raws.map((raw) => new AnimalResponse(raw));
+    return new Pagination(animals, 1, animals.length, animals.length, true);
+  }
 
   async read(id: number, user: User) {
     const animal = await this.prisma.animal.findUnique({

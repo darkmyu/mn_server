@@ -1,4 +1,5 @@
 import { GetUser } from '@/auth/decorator/get-user.decorator';
+import { ApiOkResponsePagination } from '@/common/decorator/api-ok-response-pagination.dto';
 import { FileResponse } from '@/file/dto/file-response.dto';
 import {
   Body,
@@ -25,6 +26,12 @@ import { AnimalUpdateRequest } from './dto/animal-update-request.dto';
 @Controller('animals')
 export class AnimalController {
   constructor(private readonly animalService: AnimalService) {}
+
+  @ApiOkResponsePagination(AnimalResponse)
+  @Get()
+  async all(@GetUser() user: User) {
+    return this.animalService.all(user);
+  }
 
   @ApiOkResponse({
     type: AnimalResponse,
