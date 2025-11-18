@@ -37,7 +37,7 @@ export class PhotoController {
     schema: {
       type: 'object',
       properties: {
-        thumbnail: {
+        image: {
           type: 'string',
           format: 'binary',
         },
