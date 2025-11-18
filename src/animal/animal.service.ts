@@ -137,7 +137,7 @@ export class AnimalService {
   }
 
   async upload(thumbnail: Express.Multer.File) {
-    const key = this.fileService.generateKey({ prefix: 'thumbnails', file: thumbnail });
+    const key = this.fileService.generateKey({ prefix: 'animals', file: thumbnail });
 
     return this.fileService.upload(key, thumbnail);
   }

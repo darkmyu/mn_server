@@ -1,3 +1,4 @@
+import { FileService } from '@/file/file.service';
 import { PrismaService } from '@/prisma/prisma.service';
 import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { User } from '@prisma/client';
@@ -6,7 +7,10 @@ import { PhotoResponse } from './dto/photo-response.dto';
 
 @Injectable()
 export class PhotoService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly fileService: FileService,
+  ) {}
 
   async create(user: User, request: PhotoCreateRequest) {
     const animal = await this.prisma.animal.findUnique({
@@ -27,7 +31,7 @@ export class PhotoService {
       data: {
         userId: user.id,
         animalId: request.animalId,
-        url: request.url,
+        image: request.image,
         title: request.title,
         description: request.description,
         ...(request.tags && {
@@ -60,5 +64,11 @@ export class PhotoService {
     });
 
     return new PhotoResponse(photo);
+  }
+
+  async upload(image: Express.Multer.File) {
+    const key = this.fileService.generateKey({ prefix: 'photos', file: image });
+
+    return this.fileService.upload(key, image);
   }
 }

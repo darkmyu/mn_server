@@ -7,7 +7,7 @@ import { nanoid } from 'nanoid';
 import { FileResponse } from './dto/file-response.dto';
 
 interface KeyParams {
-  prefix: 'thumbnails';
+  prefix: 'photos' | 'animals';
   file: Express.Multer.File;
 }
 

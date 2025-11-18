@@ -10,7 +10,7 @@ export class PhotoCreateRequest {
   @ApiProperty()
   @IsString()
   @IsNotEmpty()
-  url: string;
+  image: string;
 
   @ApiPropertyOptional()
   @IsString()

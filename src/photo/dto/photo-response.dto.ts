@@ -9,7 +9,7 @@ export class PhotoResponse {
   id: number;
 
   @ApiProperty()
-  url: string;
+  image: string;
 
   @ApiProperty({
     type: 'string',
@@ -54,7 +54,7 @@ export class PhotoResponse {
     }>,
   ) {
     this.id = photo.id;
-    this.url = photo.url;
+    this.image = photo.image;
     this.title = photo.title;
     this.description = photo.description;
     this.tags = photo.tags.map(({ tag }) => new TagResponse(tag));
