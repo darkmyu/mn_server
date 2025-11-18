@@ -88,7 +88,7 @@ export class AnimalController {
       new ParseFilePipe({
         validators: [
           new MaxFileSizeValidator({ maxSize: 1024 * 1024 * 10 }),
-          new FileTypeValidator({ fileType: /image\/(png|jpeg|jpg|gif)/ }),
+          new FileTypeValidator({ fileType: /image\/(png|jpeg|jpg)/ }),
         ],
       }),
     )
