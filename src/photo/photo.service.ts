@@ -1,3 +1,4 @@
+import { ConverterService } from '@/converter/converter.service';
 import { FileService } from '@/file/file.service';
 import { PrismaService } from '@/prisma/prisma.service';
 import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
@@ -10,6 +11,7 @@ export class PhotoService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly fileService: FileService,
+    private readonly converterService: ConverterService,
   ) {}
 
   async create(user: User, request: PhotoCreateRequest) {
@@ -67,8 +69,9 @@ export class PhotoService {
   }
 
   async upload(image: Express.Multer.File) {
-    const key = this.fileService.generateKey({ prefix: 'photos', file: image });
+    const converted = await this.converterService.convertHeicToJpeg(image);
+    const key = this.fileService.generateKey({ prefix: 'photos', file: converted });
 
-    return this.fileService.upload(key, image);
+    return this.fileService.upload(key, converted);
   }
 }

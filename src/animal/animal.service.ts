@@ -1,4 +1,5 @@
 import { Pagination } from '@/common/dto/pagination.dto';
+import { ConverterService } from '@/converter/converter.service';
 import { FileService } from '@/file/file.service';
 import { PrismaService } from '@/prisma/prisma.service';
 import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
@@ -12,6 +13,7 @@ export class AnimalService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly fileService: FileService,
+    private readonly converterService: ConverterService,
   ) {}
 
   async all(user: User) {
@@ -137,8 +139,9 @@ export class AnimalService {
   }
 
   async upload(thumbnail: Express.Multer.File) {
-    const key = this.fileService.generateKey({ prefix: 'animals', file: thumbnail });
+    const converted = await this.converterService.convertHeicToJpeg(thumbnail);
+    const key = this.fileService.generateKey({ prefix: 'animals', file: converted });
 
-    return this.fileService.upload(key, thumbnail);
+    return this.fileService.upload(key, converted);
   }
 }

@@ -87,8 +87,8 @@ export class AnimalController {
     @UploadedFile(
       new ParseFilePipe({
         validators: [
-          new MaxFileSizeValidator({ maxSize: 1024 * 1024 * 10 }),
-          new FileTypeValidator({ fileType: /image\/(png|jpeg|jpg)/ }),
+          new MaxFileSizeValidator({ maxSize: 1024 * 1024 * 30 }),
+          new FileTypeValidator({ fileType: /image\/(jpeg|png|heic|heif|webp)/ }),
         ],
       }),
     )
