@@ -4,22 +4,34 @@ import {
   Body,
   Controller,
   FileTypeValidator,
+  Get,
   MaxFileSizeValidator,
+  Param,
   ParseFilePipe,
   Post,
+  Put,
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ApiBody, ApiConsumes, ApiCreatedResponse } from '@nestjs/swagger';
+import { ApiBody, ApiConsumes, ApiCreatedResponse, ApiOkResponse } from '@nestjs/swagger';
 import { User } from '@prisma/client';
 import { PhotoCreateRequest } from './dto/photo-create-request.dto';
 import { PhotoResponse } from './dto/photo-response.dto';
+import { PhotoUpdateRequest } from './dto/photo-update-request.dto';
 import { PhotoService } from './photo.service';
 
 @Controller('photos')
 export class PhotoController {
   constructor(private readonly photoService: PhotoService) {}
+
+  @ApiOkResponse({
+    type: PhotoResponse,
+  })
+  @Get(':id')
+  async read(@Param('id') id: number, @GetUser() user: User) {
+    return this.photoService.read(id, user);
+  }
 
   @ApiCreatedResponse({
     type: PhotoResponse,
@@ -27,6 +39,14 @@ export class PhotoController {
   @Post()
   async create(@GetUser() user: User, @Body() request: PhotoCreateRequest) {
     return this.photoService.create(user, request);
+  }
+
+  @ApiOkResponse({
+    type: PhotoResponse,
+  })
+  @Put(':id')
+  async update(@Param('id') id: number, @GetUser() user: User, @Body() request: PhotoUpdateRequest) {
+    return this.photoService.update(id, user, request);
   }
 
   @ApiCreatedResponse({
