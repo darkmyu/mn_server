@@ -4,6 +4,7 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as dayjs from 'dayjs';
 import { nanoid } from 'nanoid';
+import * as sharp from 'sharp';
 import { FileResponse } from './dto/file-response.dto';
 
 interface KeyParams {
@@ -31,6 +32,13 @@ export class FileService {
   }
 
   async upload(key: string, file: Express.Multer.File) {
+    const metadata = await sharp(file.buffer).metadata();
+    const path = `${this.R2_URL}/${key}`;
+    const size = file.size;
+    const width = metadata.width;
+    const height = metadata.height;
+    const mimetype = file.mimetype;
+
     await this.R2.send(
       new PutObjectCommand({
         Bucket: this.R2_BUCKET,
@@ -40,7 +48,7 @@ export class FileService {
       }),
     );
 
-    return new FileResponse(`${this.R2_URL}/${key}`);
+    return new FileResponse(path, size, width, height, mimetype);
   }
 
   generateKey({ prefix, file }: KeyParams) {

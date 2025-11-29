@@ -96,7 +96,6 @@ model Photo {
   userId   Int @map("user_id")
   animalId Int @map("animal_id")
 
-  image       String
   title       String?
   description String?
   createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz()
@@ -105,7 +104,8 @@ model Photo {
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   animal Animal @relation(fields: [animalId], references: [id], onDelete: Cascade)
 
-  tags PhotoTag[]
+  tags  PhotoTag[]
+  image PhotoImage?
 
   @@map("photos")
 }
@@ -122,4 +122,21 @@ model PhotoTag {
 
   @@id([photoId, tagId])
   @@map("photo_tags")
+}
+
+model PhotoImage {
+  id      Int @id @default(autoincrement())
+  photoId Int @unique @map("photo_id")
+
+  path      String
+  size      Int
+  width     Int
+  height    Int
+  mimetype  String
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz()
+
+  photo Photo @relation(fields: [photoId], references: [id], onDelete: Cascade)
+
+  @@map("photo_images")
 }

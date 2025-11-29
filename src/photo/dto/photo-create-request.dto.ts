@@ -1,5 +1,7 @@
+import { FileRequest } from '@/file/dto/file-request.dto';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsArray, IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
+import { Type } from 'class-transformer';
+import { IsArray, IsNotEmpty, IsNotEmptyObject, IsNumber, IsOptional, IsString, ValidateNested } from 'class-validator';
 
 export class PhotoCreateRequest {
   @ApiProperty()
@@ -8,9 +10,10 @@ export class PhotoCreateRequest {
   animalId: number;
 
   @ApiProperty()
-  @IsString()
-  @IsNotEmpty()
-  image: string;
+  @IsNotEmptyObject()
+  @ValidateNested()
+  @Type(() => FileRequest)
+  image: FileRequest;
 
   @ApiPropertyOptional()
   @IsString()

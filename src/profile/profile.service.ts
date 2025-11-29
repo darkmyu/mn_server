@@ -58,6 +58,7 @@ export class ProfileService {
         photos: {
           include: {
             user: true,
+            image: true,
             animal: {
               include: {
                 user: true,

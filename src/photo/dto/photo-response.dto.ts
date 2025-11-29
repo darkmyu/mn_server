@@ -1,4 +1,5 @@
 import { AnimalResponse } from '@/animal/dto/animal-response.dto';
+import { FileResponse } from '@/file/dto/file-response.dto';
 import { ProfileResponse } from '@/profile/dto/profile-response.dto';
 import { TagResponse } from '@/tag/dto/tag-response.dto';
 import { ApiProperty } from '@nestjs/swagger';
@@ -9,7 +10,7 @@ export class PhotoResponse {
   id: number;
 
   @ApiProperty()
-  image: string;
+  image: FileResponse;
 
   @ApiProperty({
     type: 'string',
@@ -39,6 +40,7 @@ export class PhotoResponse {
     photo: Prisma.PhotoGetPayload<{
       include: {
         user: true;
+        image: true;
         animal: {
           include: {
             user: true;
@@ -54,11 +56,20 @@ export class PhotoResponse {
     }>,
   ) {
     this.id = photo.id;
-    this.image = photo.image;
     this.title = photo.title;
     this.description = photo.description;
     this.tags = photo.tags.map(({ tag }) => new TagResponse(tag));
     this.author = new ProfileResponse(photo.user);
     this.animal = new AnimalResponse(photo.animal);
+
+    if (photo.image) {
+      this.image = new FileResponse(
+        photo.image.path,
+        photo.image.size,
+        photo.image.width,
+        photo.image.height,
+        photo.image.mimetype,
+      );
+    }
   }
 }

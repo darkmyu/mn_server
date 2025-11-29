@@ -22,6 +22,7 @@ export class PhotoService {
       },
       include: {
         user: true,
+        image: true,
         animal: {
           include: {
             user: true,
@@ -66,7 +67,15 @@ export class PhotoService {
       data: {
         userId: user.id,
         animalId: request.animalId,
-        image: request.image,
+        image: {
+          create: {
+            path: request.image.path,
+            size: request.image.size,
+            width: request.image.width,
+            height: request.image.height,
+            mimetype: request.image.mimetype,
+          },
+        },
         title: request.title,
         description: request.description,
         ...(request.tags && {
@@ -84,6 +93,7 @@ export class PhotoService {
       },
       include: {
         user: true,
+        image: true,
         animal: {
           include: {
             user: true,
@@ -123,7 +133,15 @@ export class PhotoService {
       data: {
         userId: user.id,
         animalId: request.animalId,
-        image: request.image,
+        image: {
+          create: {
+            path: request.image.path,
+            size: request.image.size,
+            width: request.image.width,
+            height: request.image.height,
+            mimetype: request.image.mimetype,
+          },
+        },
         title: request.title,
         description: request.description,
         ...(request.tags && {
@@ -142,6 +160,7 @@ export class PhotoService {
       },
       include: {
         user: true,
+        image: true,
         animal: {
           include: {
             user: true,
