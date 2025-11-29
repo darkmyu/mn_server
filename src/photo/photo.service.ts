@@ -134,7 +134,7 @@ export class PhotoService {
         userId: user.id,
         animalId: request.animalId,
         image: {
-          create: {
+          update: {
             path: request.image.path,
             size: request.image.size,
             width: request.image.width,
