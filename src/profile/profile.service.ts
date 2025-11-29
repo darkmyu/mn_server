@@ -1,4 +1,5 @@
 import { AnimalResponse } from '@/animal/dto/animal-response.dto';
+import { PaginationQuery } from '@/common/dto/pagination-query.dto';
 import { Pagination } from '@/common/dto/pagination.dto';
 import { PhotoResponse } from '@/photo/dto/photo-response.dto';
 import { PrismaService } from '@/prisma/prisma.service';
@@ -49,32 +50,10 @@ export class ProfileService {
     return new Pagination(animals, 1, animals.length, animals.length, true);
   }
 
-  async photos(username: string) {
+  async photos(username: string, { page, limit }: PaginationQuery) {
     const user = await this.prisma.user.findUnique({
       where: {
         username,
-      },
-      select: {
-        photos: {
-          include: {
-            user: true,
-            image: true,
-            animal: {
-              include: {
-                user: true,
-                breed: true,
-              },
-            },
-            tags: {
-              include: {
-                tag: true,
-              },
-            },
-          },
-          orderBy: {
-            id: 'desc',
-          },
-        },
       },
     });
 
@@ -82,7 +61,42 @@ export class ProfileService {
       throw new NotFoundException('user is not found');
     }
 
-    const photos = user.photos.map((photo) => new PhotoResponse(photo));
-    return new Pagination(photos, 1, photos.length, photos.length, true);
+    const [total, photos] = await this.prisma.$transaction([
+      this.prisma.photo.count({
+        where: {
+          userId: user.id,
+        },
+      }),
+      this.prisma.photo.findMany({
+        where: {
+          userId: user.id,
+        },
+        include: {
+          user: true,
+          image: true,
+          animal: {
+            include: {
+              user: true,
+              breed: true,
+            },
+          },
+          tags: {
+            include: {
+              tag: true,
+            },
+          },
+        },
+        orderBy: {
+          id: 'desc',
+        },
+        skip: (page - 1) * limit,
+        take: limit,
+      }),
+    ]);
+
+    const items = photos.map((photo) => new PhotoResponse(photo));
+    const isLast = page * limit >= total;
+
+    return new Pagination(items, page, total, limit, isLast);
   }
 }

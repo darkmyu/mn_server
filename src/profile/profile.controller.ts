@@ -1,8 +1,9 @@
 import { AnimalResponse } from '@/animal/dto/animal-response.dto';
 import { Public } from '@/auth/decorator/public.decorator';
 import { ApiOkResponsePagination } from '@/common/decorator/api-ok-response-pagination.dto';
+import { PaginationQuery } from '@/common/dto/pagination-query.dto';
 import { PhotoResponse } from '@/photo/dto/photo-response.dto';
-import { Controller, Get, Param } from '@nestjs/common';
+import { Controller, Get, Param, Query } from '@nestjs/common';
 import { ApiOkResponse } from '@nestjs/swagger';
 import { ProfileResponse } from './dto/profile-response.dto';
 import { ProfileService } from './profile.service';
@@ -30,7 +31,7 @@ export class ProfileController {
   @ApiOkResponsePagination(PhotoResponse)
   @Public()
   @Get(':username/photos')
-  async photos(@Param('username') username: string) {
-    return this.profileService.photos(username);
+  async photos(@Param('username') username: string, @Query() query: PaginationQuery) {
+    return this.profileService.photos(username, query);
   }
 }
