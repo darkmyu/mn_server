@@ -99,4 +99,43 @@ export class ProfileService {
 
     return new Pagination(items, page, total, limit, isLast);
   }
+
+  async photo(username: string, id: number) {
+    const user = await this.prisma.user.findUnique({
+      where: {
+        username,
+      },
+    });
+
+    if (!user) {
+      throw new NotFoundException('user is not found');
+    }
+
+    const photo = await this.prisma.photo.findUnique({
+      where: {
+        id,
+      },
+      include: {
+        user: true,
+        image: true,
+        animal: {
+          include: {
+            user: true,
+            breed: true,
+          },
+        },
+        tags: {
+          include: {
+            tag: true,
+          },
+        },
+      },
+    });
+
+    if (!photo) {
+      throw new NotFoundException('photo is not found');
+    }
+
+    return new PhotoResponse(photo);
+  }
 }

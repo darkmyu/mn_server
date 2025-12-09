@@ -34,4 +34,11 @@ export class ProfileController {
   async photos(@Param('username') username: string, @Query() query: PaginationQuery) {
     return this.profileService.photos(username, query);
   }
+
+  @ApiOkResponse()
+  @Public()
+  @Get(':username/photos/:id')
+  async photo(@Param('username') username: string, @Param('id') id: number) {
+    return this.profileService.photo(username, id);
+  }
 }
