@@ -35,7 +35,9 @@ export class ProfileController {
     return this.profileService.photos(username, query);
   }
 
-  @ApiOkResponse()
+  @ApiOkResponse({
+    type: PhotoResponse,
+  })
   @Public()
   @Get(':username/photos/:id')
   async photo(@Param('username') username: string, @Param('id') id: number) {
