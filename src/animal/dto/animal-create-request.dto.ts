@@ -23,7 +23,7 @@ export class AnimalCreateRequest {
   @ApiProperty()
   @IsDateString()
   @IsNotEmpty()
-  birthday: Date;
+  birthday: string;
 
   @ApiPropertyOptional()
   @IsString()
