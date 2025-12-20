@@ -98,6 +98,8 @@ model Photo {
 
   title       String?
   description String?
+  likes       Int      @default(0)
+  score       Float    @default(0)
   createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz()
   updatedAt   DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz()
 
@@ -107,6 +109,7 @@ model Photo {
   tags  PhotoTag[]
   image PhotoImage?
 
+  @@index([score(sort: Desc), id(sort: Desc)], map: "photos_score_id_desc_idx")
   @@map("photos")
 }
 

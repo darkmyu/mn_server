@@ -1,3 +1,5 @@
+import { CursorPaginationQuery } from '@/common/dto/cursor-pagination-query.dto';
+import { CursorPagination } from '@/common/dto/cursor-pagination.dto';
 import { ConverterService } from '@/converter/converter.service';
 import { FileService } from '@/file/file.service';
 import { PrismaService } from '@/prisma/prisma.service';
@@ -14,6 +16,43 @@ export class PhotoService {
     private readonly fileService: FileService,
     private readonly converterService: ConverterService,
   ) {}
+
+  async all({ cursor, limit }: CursorPaginationQuery) {
+    const [total, photos] = await this.prisma.$transaction([
+      this.prisma.photo.count(),
+      this.prisma.photo.findMany({
+        include: {
+          user: true,
+          image: true,
+          animal: {
+            include: {
+              user: true,
+              breed: true,
+            },
+          },
+          tags: {
+            include: {
+              tag: true,
+            },
+          },
+        },
+        take: limit + 1,
+        skip: cursor ? 1 : 0,
+        cursor: cursor ? { id: cursor } : undefined,
+        orderBy: [{ score: 'desc' }, { id: 'desc' }],
+      }),
+    ]);
+
+    const hasNextPage = photos.length > limit;
+    if (hasNextPage) {
+      photos.pop();
+    }
+
+    const items = photos.map((photo) => new PhotoResponse(photo));
+    const nextCursor = hasNextPage ? photos[photos.length - 1].id : null;
+
+    return new CursorPagination(items, nextCursor, total, limit, hasNextPage);
+  }
 
   async read(id: number, user: User) {
     const photo = await this.prisma.photo.findUnique({
