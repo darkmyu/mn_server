@@ -1,8 +1,7 @@
 import { GetUser } from '@/auth/decorator/get-user.decorator';
 import { Public } from '@/auth/decorator/public.decorator';
-import { ApiOkResponsePagination } from '@/common/decorator/api-ok-response-pagination.dto';
+import { ApiOkResponseCursorPagination } from '@/common/decorator/api-ok-response-cursor-pagination.dto';
 import { CursorPaginationQuery } from '@/common/dto/cursor-pagination-query.dto';
-import { CursorPagination } from '@/common/dto/cursor-pagination.dto';
 import { FileResponse } from '@/file/dto/file-response.dto';
 import {
   Body,
@@ -30,7 +29,7 @@ import { PhotoService } from './photo.service';
 export class PhotoController {
   constructor(private readonly photoService: PhotoService) {}
 
-  @ApiOkResponsePagination(CursorPagination)
+  @ApiOkResponseCursorPagination(PhotoResponse)
   @Public()
   @Get()
   async all(@Query() query: CursorPaginationQuery) {

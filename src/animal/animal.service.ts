@@ -31,7 +31,7 @@ export class AnimalService {
     });
 
     const animals = raws.map((raw) => new AnimalResponse(raw));
-    return new Pagination(animals, 1, animals.length, animals.length, true);
+    return new Pagination(animals, 1, animals.length, animals.length, false);
   }
 
   async read(id: number, user: User) {

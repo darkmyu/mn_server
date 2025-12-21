@@ -19,6 +19,6 @@ export class BreedService {
     });
 
     const breeds = raws.map((breed) => new BreedResponse(breed));
-    return new Pagination(breeds, 1, breeds.length, breeds.length, true);
+    return new Pagination(breeds, 1, breeds.length, breeds.length, false);
   }
 }

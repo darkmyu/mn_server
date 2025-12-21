@@ -1,5 +1,6 @@
 import { AnimalResponse } from '@/animal/dto/animal-response.dto';
-import { PaginationQuery } from '@/common/dto/pagination-query.dto';
+import { CursorPaginationQuery } from '@/common/dto/cursor-pagination-query.dto';
+import { CursorPagination } from '@/common/dto/cursor-pagination.dto';
 import { Pagination } from '@/common/dto/pagination.dto';
 import { PhotoResponse } from '@/photo/dto/photo-response.dto';
 import { PrismaService } from '@/prisma/prisma.service';
@@ -47,10 +48,10 @@ export class ProfileService {
     }
 
     const animals = user.animals.map((animal) => new AnimalResponse(animal));
-    return new Pagination(animals, 1, animals.length, animals.length, true);
+    return new Pagination(animals, 1, animals.length, animals.length, false);
   }
 
-  async photos(username: string, { page, limit }: PaginationQuery) {
+  async photos(username: string, { cursor, limit }: CursorPaginationQuery) {
     const user = await this.prisma.user.findUnique({
       where: {
         username,
@@ -86,18 +87,24 @@ export class ProfileService {
             },
           },
         },
+        take: limit + 1,
+        skip: cursor ? 1 : 0,
+        cursor: cursor ? { id: cursor } : undefined,
         orderBy: {
           id: 'desc',
         },
-        skip: (page - 1) * limit,
-        take: limit,
       }),
     ]);
 
-    const items = photos.map((photo) => new PhotoResponse(photo));
-    const isLast = page * limit >= total;
+    const hasNextPage = photos.length > limit;
+    if (hasNextPage) {
+      photos.pop();
+    }
 
-    return new Pagination(items, page, total, limit, isLast);
+    const items = photos.map((photo) => new PhotoResponse(photo));
+    const nextCursor = hasNextPage ? photos[photos.length - 1].id : null;
+
+    return new CursorPagination(items, nextCursor, total, limit, hasNextPage);
   }
 
   async photo(username: string, id: number) {
