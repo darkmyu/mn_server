@@ -1,3 +1,4 @@
+import { AlgorithmService } from '@/algorithm/algorithm.service';
 import { CursorPaginationQuery } from '@/common/dto/cursor-pagination-query.dto';
 import { CursorPagination } from '@/common/dto/cursor-pagination.dto';
 import { ConverterService } from '@/converter/converter.service';
@@ -5,6 +6,7 @@ import { FileService } from '@/file/file.service';
 import { PrismaService } from '@/prisma/prisma.service';
 import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { User } from '@prisma/client';
+import * as dayjs from 'dayjs';
 import { PhotoCreateRequest } from './dto/photo-create-request.dto';
 import { PhotoResponse } from './dto/photo-response.dto';
 import { PhotoUpdateRequest } from './dto/photo-update-request.dto';
@@ -15,6 +17,7 @@ export class PhotoService {
     private readonly prisma: PrismaService,
     private readonly fileService: FileService,
     private readonly converterService: ConverterService,
+    private readonly algorithmService: AlgorithmService,
   ) {}
 
   async all({ cursor, limit }: CursorPaginationQuery) {
@@ -102,10 +105,13 @@ export class PhotoService {
       throw new UnauthorizedException('you are not the owner of this animal');
     }
 
+    const score = this.algorithmService.calculateScore(0, dayjs().toDate());
+
     const photo = await this.prisma.photo.create({
       data: {
         userId: user.id,
         animalId: request.animalId,
+        score,
         image: {
           create: {
             path: request.image.path,
