@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { APP_GUARD } from '@nestjs/core';
+import { ScheduleModule } from '@nestjs/schedule';
 import { AnimalModule } from './animal/animal.module';
 import { AuthModule } from './auth/auth.module';
 import { JwtAuthGuard } from './auth/guard/jwt-auth.guard';
@@ -12,6 +13,7 @@ import { ProfileModule } from './profile/profile.module';
 
 @Module({
   imports: [
+    ScheduleModule.forRoot(),
     AppConfigModule,
     PrismaModule,
     FileModule,

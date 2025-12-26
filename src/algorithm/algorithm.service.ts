@@ -11,9 +11,9 @@ export class AlgorithmService {
    * @param createdAt - photo creation date
    */
   calculateScore(points: number, createdAt: Date) {
-    const GRAVITY = 1.8;
-    const hours = dayjs().diff(createdAt, 'hours');
+    const gravity = 0.8;
+    const hours = dayjs().diff(createdAt, 'hours', true);
 
-    return points / Math.pow(hours + 2, GRAVITY);
+    return points / Math.pow(hours + 2, gravity);
   }
 }
