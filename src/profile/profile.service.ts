@@ -51,7 +51,9 @@ export class ProfileService {
     return new Pagination(animals, 1, animals.length, animals.length, false);
   }
 
-  async photos(username: string, { cursor, limit }: CursorPaginationQuery) {
+  async photos(username: string, query: CursorPaginationQuery) {
+    const { cursor, limit } = query;
+
     const user = await this.prisma.user.findUnique({
       where: {
         username,

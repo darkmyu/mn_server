@@ -1,7 +1,6 @@
 import { GetUser } from '@/auth/decorator/get-user.decorator';
 import { Public } from '@/auth/decorator/public.decorator';
 import { ApiOkResponseCursorPagination } from '@/common/decorator/api-ok-response-cursor-pagination.dto';
-import { CursorPaginationQuery } from '@/common/dto/cursor-pagination-query.dto';
 import { FileResponse } from '@/file/dto/file-response.dto';
 import {
   Body,
@@ -21,6 +20,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBody, ApiConsumes, ApiCreatedResponse, ApiOkResponse } from '@nestjs/swagger';
 import { User } from '@prisma/client';
 import { PhotoCreateRequest } from './dto/photo-create-request.dto';
+import { PhotoListQuery } from './dto/photo-list-query.dto';
 import { PhotoResponse } from './dto/photo-response.dto';
 import { PhotoUpdateRequest } from './dto/photo-update-request.dto';
 import { PhotoService } from './photo.service';
@@ -32,7 +32,7 @@ export class PhotoController {
   @ApiOkResponseCursorPagination(PhotoResponse)
   @Public()
   @Get()
-  async all(@Query() query: CursorPaginationQuery) {
+  async all(@Query() query: PhotoListQuery) {
     return this.photoService.all(query);
   }
 

@@ -1,4 +1,3 @@
-import { CursorPaginationQuery } from '@/common/dto/cursor-pagination-query.dto';
 import { CursorPagination } from '@/common/dto/cursor-pagination.dto';
 import { ConverterService } from '@/converter/converter.service';
 import { FileService } from '@/file/file.service';
@@ -6,6 +5,7 @@ import { PrismaService } from '@/prisma/prisma.service';
 import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { User } from '@prisma/client';
 import { PhotoCreateRequest } from './dto/photo-create-request.dto';
+import { PhotoListQuery, PhotoSort } from './dto/photo-list-query.dto';
 import { PhotoResponse } from './dto/photo-response.dto';
 import { PhotoUpdateRequest } from './dto/photo-update-request.dto';
 
@@ -17,7 +17,9 @@ export class PhotoService {
     private readonly converterService: ConverterService,
   ) {}
 
-  async all({ cursor, limit }: CursorPaginationQuery) {
+  async all(query: PhotoListQuery) {
+    const { cursor, limit, sort } = query;
+
     const [total, photos] = await this.prisma.$transaction([
       this.prisma.photo.count(),
       this.prisma.photo.findMany({
@@ -39,7 +41,7 @@ export class PhotoService {
         take: limit + 1,
         skip: cursor ? 1 : 0,
         cursor: cursor ? { id: cursor } : undefined,
-        orderBy: [{ score: 'desc' }, { id: 'desc' }],
+        orderBy: sort === PhotoSort.POPULAR ? [{ score: 'desc' }, { id: 'desc' }] : [{ id: 'desc' }],
       }),
     ]);
 
