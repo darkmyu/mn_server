@@ -121,14 +121,18 @@ export class PhotoService {
         description: request.description,
         ...(request.tags && {
           tags: {
-            create: request.tags.map((name) => ({
-              tag: {
-                connectOrCreate: {
-                  where: { slug: name },
-                  create: { name, slug: name },
+            create: request.tags.map((name) => {
+              const slug = name.toLowerCase().replace(/\s+/g, '-');
+
+              return {
+                tag: {
+                  connectOrCreate: {
+                    where: { slug },
+                    create: { name, slug },
+                  },
                 },
-              },
-            })),
+              };
+            }),
           },
         }),
       },
@@ -188,14 +192,18 @@ export class PhotoService {
         ...(request.tags && {
           tags: {
             deleteMany: {},
-            create: request.tags.map((name) => ({
-              tag: {
-                connectOrCreate: {
-                  where: { slug: name },
-                  create: { name, slug: name },
+            create: request.tags.map((name) => {
+              const slug = name.toLowerCase().replace(/\s+/g, '-');
+
+              return {
+                tag: {
+                  connectOrCreate: {
+                    where: { slug },
+                    create: { name, slug },
+                  },
                 },
-              },
-            })),
+              };
+            }),
           },
         }),
       },
