@@ -25,14 +25,14 @@ export class PhotoService {
       this.prisma.photo.findMany({
         include: {
           user: true,
-          image: true,
+          photoImage: true,
           animal: {
             include: {
               user: true,
               breed: true,
             },
           },
-          tags: {
+          photoTags: {
             include: {
               tag: true,
             },
@@ -63,14 +63,14 @@ export class PhotoService {
       },
       include: {
         user: true,
-        image: true,
+        photoImage: true,
         animal: {
           include: {
             user: true,
             breed: true,
           },
         },
-        tags: {
+        photoTags: {
           include: {
             tag: true,
           },
@@ -108,7 +108,7 @@ export class PhotoService {
       data: {
         userId: user.id,
         animalId: request.animalId,
-        image: {
+        photoImage: {
           create: {
             path: request.image.path,
             size: request.image.size,
@@ -120,7 +120,7 @@ export class PhotoService {
         title: request.title,
         description: request.description,
         ...(request.tags && {
-          tags: {
+          photoTags: {
             create: request.tags.map((name) => {
               const slug = name.toLowerCase().replace(/\s+/g, '-');
 
@@ -138,14 +138,14 @@ export class PhotoService {
       },
       include: {
         user: true,
-        image: true,
+        photoImage: true,
         animal: {
           include: {
             user: true,
             breed: true,
           },
         },
-        tags: {
+        photoTags: {
           include: {
             tag: true,
           },
@@ -178,7 +178,7 @@ export class PhotoService {
       data: {
         userId: user.id,
         animalId: request.animalId,
-        image: {
+        photoImage: {
           update: {
             path: request.image.path,
             size: request.image.size,
@@ -190,7 +190,7 @@ export class PhotoService {
         title: request.title,
         description: request.description,
         ...(request.tags && {
-          tags: {
+          photoTags: {
             deleteMany: {},
             create: request.tags.map((name) => {
               const slug = name.toLowerCase().replace(/\s+/g, '-');
@@ -209,14 +209,14 @@ export class PhotoService {
       },
       include: {
         user: true,
-        image: true,
+        photoImage: true,
         animal: {
           include: {
             user: true,
             breed: true,
           },
         },
-        tags: {
+        photoTags: {
           include: {
             tag: true,
           },

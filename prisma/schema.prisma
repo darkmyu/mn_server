@@ -41,8 +41,9 @@ model User {
   createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz()
   updatedAt    DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz()
 
-  animals Animal[]
-  photos  Photo[]
+  animals    Animal[]
+  photos     Photo[]
+  photoLikes PhotoLike[]
 
   @@map("users")
 }
@@ -87,7 +88,7 @@ model Tag {
   createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz()
   updatedAt DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz()
 
-  photos PhotoTag[]
+  photoTags PhotoTag[]
 
   @@map("tags")
 }
@@ -107,8 +108,9 @@ model Photo {
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   animal Animal @relation(fields: [animalId], references: [id], onDelete: Cascade)
 
-  tags  PhotoTag[]
-  image PhotoImage?
+  photoTags  PhotoTag[]
+  photoImage PhotoImage?
+  photoLike  PhotoLike?
 
   @@index([score(sort: Desc), id(sort: Desc)], map: "photos_score_id_desc_idx")
   @@map("photos")
@@ -143,4 +145,17 @@ model PhotoImage {
   photo Photo @relation(fields: [photoId], references: [id], onDelete: Cascade)
 
   @@map("photo_images")
+}
+
+model PhotoLike {
+  id      Int @id @default(autoincrement())
+  userId  Int @unique @map("user_id")
+  photoId Int @unique @map("photo_id")
+
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz()
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  photo Photo @relation(fields: [photoId], references: [id], onDelete: Cascade)
+
+  @@map("photo_likes")
 }

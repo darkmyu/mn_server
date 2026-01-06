@@ -40,14 +40,14 @@ export class PhotoResponse {
     photo: Prisma.PhotoGetPayload<{
       include: {
         user: true;
-        image: true;
+        photoImage: true;
         animal: {
           include: {
             user: true;
             breed: true;
           };
         };
-        tags: {
+        photoTags: {
           include: {
             tag: true;
           };
@@ -58,17 +58,17 @@ export class PhotoResponse {
     this.id = photo.id;
     this.title = photo.title;
     this.description = photo.description;
-    this.tags = photo.tags.map(({ tag }) => new TagResponse(tag));
+    this.tags = photo.photoTags.map(({ tag }) => new TagResponse(tag));
     this.author = new ProfileResponse(photo.user);
     this.animal = new AnimalResponse(photo.animal);
 
-    if (photo.image) {
+    if (photo.photoImage) {
       this.image = new FileResponse(
-        photo.image.path,
-        photo.image.size,
-        photo.image.width,
-        photo.image.height,
-        photo.image.mimetype,
+        photo.photoImage.path,
+        photo.photoImage.size,
+        photo.photoImage.width,
+        photo.photoImage.height,
+        photo.photoImage.mimetype,
       );
     }
   }

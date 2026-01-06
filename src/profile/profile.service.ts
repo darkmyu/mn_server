@@ -76,14 +76,14 @@ export class ProfileService {
         },
         include: {
           user: true,
-          image: true,
+          photoImage: true,
           animal: {
             include: {
               user: true,
               breed: true,
             },
           },
-          tags: {
+          photoTags: {
             include: {
               tag: true,
             },
@@ -126,14 +126,14 @@ export class ProfileService {
       },
       include: {
         user: true,
-        image: true,
+        photoImage: true,
         animal: {
           include: {
             user: true,
             breed: true,
           },
         },
-        tags: {
+        photoTags: {
           include: {
             tag: true,
           },
