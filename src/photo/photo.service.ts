@@ -1,3 +1,4 @@
+import { AlgorithmService } from '@/algorithm/algorithm.service';
 import { CursorPagination } from '@/common/dto/cursor-pagination.dto';
 import { ConverterService } from '@/converter/converter.service';
 import { FileService } from '@/file/file.service';
@@ -15,6 +16,7 @@ export class PhotoService {
     private readonly prisma: PrismaService,
     private readonly fileService: FileService,
     private readonly converterService: ConverterService,
+    private readonly algorithmService: AlgorithmService,
   ) {}
 
   async all(query: PhotoListQuery) {
@@ -225,6 +227,107 @@ export class PhotoService {
     });
 
     return new PhotoResponse(updatedPhoto);
+  }
+
+  async like(id: number, user: User) {
+    const photo = await this.prisma.photo.findUnique({
+      where: {
+        id,
+      },
+    });
+
+    if (!photo) {
+      throw new NotFoundException('photo is not found');
+    }
+
+    await this.prisma.$transaction(async (tx) => {
+      await tx.photoLike.upsert({
+        where: {
+          userId_photoId: {
+            userId: user.id,
+            photoId: id,
+          },
+        },
+        create: {
+          userId: user.id,
+          photoId: id,
+        },
+        update: {},
+      });
+
+      const { likes } = await tx.photo.update({
+        where: {
+          id,
+        },
+        data: {
+          likes: {
+            increment: 1,
+          },
+        },
+        select: {
+          likes: true,
+        },
+      });
+
+      const score = this.algorithmService.calculateScore(likes, photo.createdAt);
+
+      await tx.photo.update({
+        where: {
+          id,
+        },
+        data: {
+          score,
+        },
+      });
+    });
+  }
+
+  async unlike(id: number, user: User) {
+    const photo = await this.prisma.photo.findUnique({
+      where: {
+        id,
+      },
+    });
+
+    if (!photo) {
+      throw new NotFoundException('photo is not found');
+    }
+
+    await this.prisma.$transaction(async (tx) => {
+      await tx.photoLike.delete({
+        where: {
+          userId_photoId: {
+            userId: user.id,
+            photoId: id,
+          },
+        },
+      });
+
+      const { likes } = await tx.photo.update({
+        where: {
+          id,
+        },
+        data: {
+          likes: {
+            decrement: 1,
+          },
+        },
+        select: {
+          likes: true,
+        },
+      });
+
+      const score = this.algorithmService.calculateScore(likes, photo.createdAt);
+
+      await tx.photo.update({
+        where: {
+          id,
+        },
+        data: {
+          score,
+        },
+      });
+    });
   }
 
   async upload(image: Express.Multer.File) {

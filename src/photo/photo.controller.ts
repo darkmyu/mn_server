@@ -5,6 +5,7 @@ import { FileResponse } from '@/file/dto/file-response.dto';
 import {
   Body,
   Controller,
+  Delete,
   FileTypeValidator,
   Get,
   MaxFileSizeValidator,
@@ -58,6 +59,18 @@ export class PhotoController {
   @Put(':id')
   async update(@Param('id') id: number, @GetUser() user: User, @Body() request: PhotoUpdateRequest) {
     return this.photoService.update(id, user, request);
+  }
+
+  @ApiOkResponse()
+  @Post(':id/likes')
+  async like(@Param('id') id: number, @GetUser() user: User) {
+    return this.photoService.like(id, user);
+  }
+
+  @ApiOkResponse()
+  @Delete(':id/likes')
+  async unlike(@Param('id') id: number, @GetUser() user: User) {
+    return this.photoService.unlike(id, user);
   }
 
   @ApiCreatedResponse({

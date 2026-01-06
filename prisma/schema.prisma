@@ -110,7 +110,7 @@ model Photo {
 
   photoTags  PhotoTag[]
   photoImage PhotoImage?
-  photoLike  PhotoLike?
+  photoLikes PhotoLike[]
 
   @@index([score(sort: Desc), id(sort: Desc)], map: "photos_score_id_desc_idx")
   @@map("photos")
@@ -149,13 +149,14 @@ model PhotoImage {
 
 model PhotoLike {
   id      Int @id @default(autoincrement())
-  userId  Int @unique @map("user_id")
-  photoId Int @unique @map("photo_id")
+  userId  Int @map("user_id")
+  photoId Int @map("photo_id")
 
   createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz()
 
   user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
   photo Photo @relation(fields: [photoId], references: [id], onDelete: Cascade)
 
+  @@unique([userId, photoId], map: "photo_likes_user_id_photo_id_key")
   @@map("photo_likes")
 }
