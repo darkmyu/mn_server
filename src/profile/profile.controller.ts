@@ -1,4 +1,6 @@
 import { AnimalResponse } from '@/animal/dto/animal-response.dto';
+import { GetUser } from '@/auth/decorator/get-user.decorator';
+import { IgnoreUnauthorized } from '@/auth/decorator/ignore-unauthorized.decorator';
 import { Public } from '@/auth/decorator/public.decorator';
 import { ApiOkResponseCursorPagination } from '@/common/decorator/api-ok-response-cursor-pagination.dto';
 import { ApiOkResponsePagination } from '@/common/decorator/api-ok-response-pagination.dto';
@@ -6,6 +8,7 @@ import { CursorPaginationQuery } from '@/common/dto/cursor-pagination-query.dto'
 import { PhotoResponse } from '@/photo/dto/photo-response.dto';
 import { Controller, Get, Param, Query } from '@nestjs/common';
 import { ApiOkResponse } from '@nestjs/swagger';
+import { User } from '@prisma/client';
 import { ProfileResponse } from './dto/profile-response.dto';
 import { ProfileService } from './profile.service';
 
@@ -30,18 +33,22 @@ export class ProfileController {
   }
 
   @ApiOkResponseCursorPagination(PhotoResponse)
-  @Public()
+  @IgnoreUnauthorized()
   @Get(':username/photos')
-  async photos(@Param('username') username: string, @Query() query: CursorPaginationQuery) {
-    return this.profileService.photos(username, query);
+  async photos(
+    @Param('username') username: string,
+    @Query() query: CursorPaginationQuery,
+    @GetUser() user: User | null,
+  ) {
+    return this.profileService.photos(username, query, user);
   }
 
   @ApiOkResponse({
     type: PhotoResponse,
   })
-  @Public()
+  @IgnoreUnauthorized()
   @Get(':username/photos/:id')
-  async photo(@Param('username') username: string, @Param('id') id: number) {
-    return this.profileService.photo(username, id);
+  async photo(@Param('username') username: string, @Param('id') id: number, @GetUser() user: User | null) {
+    return this.profileService.photo(username, id, user);
   }
 }

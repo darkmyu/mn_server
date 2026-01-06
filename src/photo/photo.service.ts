@@ -19,7 +19,7 @@ export class PhotoService {
     private readonly algorithmService: AlgorithmService,
   ) {}
 
-  async all(query: PhotoListQuery) {
+  async all(query: PhotoListQuery, user: User | null) {
     const { cursor, limit, sort } = query;
 
     const [total, photos] = await this.prisma.$transaction([
@@ -37,6 +37,11 @@ export class PhotoService {
           photoTags: {
             include: {
               tag: true,
+            },
+          },
+          photoLikes: {
+            where: {
+              userId: user?.id,
             },
           },
         },
@@ -75,6 +80,11 @@ export class PhotoService {
         photoTags: {
           include: {
             tag: true,
+          },
+        },
+        photoLikes: {
+          where: {
+            userId: user.id,
           },
         },
       },
@@ -152,6 +162,11 @@ export class PhotoService {
             tag: true,
           },
         },
+        photoLikes: {
+          where: {
+            userId: user.id,
+          },
+        },
       },
     });
 
@@ -221,6 +236,11 @@ export class PhotoService {
         photoTags: {
           include: {
             tag: true,
+          },
+        },
+        photoLikes: {
+          where: {
+            userId: user.id,
           },
         },
       },

@@ -1,5 +1,5 @@
 import { GetUser } from '@/auth/decorator/get-user.decorator';
-import { Public } from '@/auth/decorator/public.decorator';
+import { IgnoreUnauthorized } from '@/auth/decorator/ignore-unauthorized.decorator';
 import { ApiOkResponseCursorPagination } from '@/common/decorator/api-ok-response-cursor-pagination.dto';
 import { FileResponse } from '@/file/dto/file-response.dto';
 import {
@@ -31,10 +31,10 @@ export class PhotoController {
   constructor(private readonly photoService: PhotoService) {}
 
   @ApiOkResponseCursorPagination(PhotoResponse)
-  @Public()
+  @IgnoreUnauthorized()
   @Get()
-  async all(@Query() query: PhotoListQuery) {
-    return this.photoService.all(query);
+  async all(@Query() query: PhotoListQuery, @GetUser() user: User | null) {
+    return this.photoService.all(query, user);
   }
 
   @ApiOkResponse({

@@ -24,6 +24,12 @@ export class PhotoResponse {
   })
   description: string | null;
 
+  @ApiProperty()
+  likes: number;
+
+  @ApiProperty()
+  liked: boolean;
+
   @ApiProperty({
     isArray: true,
     type: TagResponse,
@@ -52,12 +58,15 @@ export class PhotoResponse {
             tag: true;
           };
         };
+        photoLikes: true;
       };
     }>,
   ) {
     this.id = photo.id;
     this.title = photo.title;
     this.description = photo.description;
+    this.likes = photo.likes;
+    this.liked = photo.photoLikes.length > 0;
     this.tags = photo.photoTags.map(({ tag }) => new TagResponse(tag));
     this.author = new ProfileResponse(photo.user);
     this.animal = new AnimalResponse(photo.animal);

@@ -5,6 +5,7 @@ import { Pagination } from '@/common/dto/pagination.dto';
 import { PhotoResponse } from '@/photo/dto/photo-response.dto';
 import { PrismaService } from '@/prisma/prisma.service';
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { User } from '@prisma/client';
 import { ProfileResponse } from './dto/profile-response.dto';
 
 @Injectable()
@@ -51,28 +52,28 @@ export class ProfileService {
     return new Pagination(animals, 1, animals.length, animals.length, false);
   }
 
-  async photos(username: string, query: CursorPaginationQuery) {
+  async photos(username: string, query: CursorPaginationQuery, user: User | null) {
     const { cursor, limit } = query;
 
-    const user = await this.prisma.user.findUnique({
+    const author = await this.prisma.user.findUnique({
       where: {
         username,
       },
     });
 
-    if (!user) {
-      throw new NotFoundException('user is not found');
+    if (!author) {
+      throw new NotFoundException('author is not found');
     }
 
     const [total, photos] = await this.prisma.$transaction([
       this.prisma.photo.count({
         where: {
-          userId: user.id,
+          userId: author.id,
         },
       }),
       this.prisma.photo.findMany({
         where: {
-          userId: user.id,
+          userId: author.id,
         },
         include: {
           user: true,
@@ -86,6 +87,11 @@ export class ProfileService {
           photoTags: {
             include: {
               tag: true,
+            },
+          },
+          photoLikes: {
+            where: {
+              userId: user?.id,
             },
           },
         },
@@ -109,15 +115,15 @@ export class ProfileService {
     return new CursorPagination(items, nextCursor, total, limit, hasNextPage);
   }
 
-  async photo(username: string, id: number) {
-    const user = await this.prisma.user.findUnique({
+  async photo(username: string, id: number, user: User | null) {
+    const author = await this.prisma.user.findUnique({
       where: {
         username,
       },
     });
 
-    if (!user) {
-      throw new NotFoundException('user is not found');
+    if (!author) {
+      throw new NotFoundException('author is not found');
     }
 
     const photo = await this.prisma.photo.findUnique({
@@ -136,6 +142,11 @@ export class ProfileService {
         photoTags: {
           include: {
             tag: true,
+          },
+        },
+        photoLikes: {
+          where: {
+            userId: user?.id,
           },
         },
       },
