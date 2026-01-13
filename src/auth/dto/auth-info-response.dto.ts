@@ -1,15 +1,15 @@
-import { ProfileResponse } from '@/profile/dto/profile-response.dto';
 import { ApiProperty } from '@nestjs/swagger';
 import { User } from '@prisma/client';
+import { AuthUserResponse } from './auth-user-response.dto';
 
 export class AuthInfoResponse {
   @ApiProperty({
+    type: AuthUserResponse,
     nullable: true,
-    type: ProfileResponse,
   })
-  profile: ProfileResponse | null;
+  profile: AuthUserResponse | null;
 
   constructor(user: User | null) {
-    this.profile = user ? new ProfileResponse(user) : null;
+    this.profile = user ? new AuthUserResponse(user) : null;
   }
 }
