@@ -44,6 +44,8 @@ model User {
   animals    Animal[]
   photos     Photo[]
   photoLikes PhotoLike[]
+  followers  Follow[]    @relation("followers_relation")
+  followings Follow[]    @relation("followings_relation")
 
   @@map("users")
 }
@@ -159,4 +161,17 @@ model PhotoLike {
 
   @@unique([userId, photoId], map: "photo_likes_user_id_photo_id_key")
   @@map("photo_likes")
+}
+
+model Follow {
+  followerId  Int @map("follower_id")
+  followingId Int @map("following_id")
+
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz()
+
+  follower  User @relation("followers_relation", fields: [followerId], references: [id], onDelete: Cascade)
+  following User @relation("followings_relation", fields: [followingId], references: [id], onDelete: Cascade)
+
+  @@id([followerId, followingId])
+  @@map("follows")
 }

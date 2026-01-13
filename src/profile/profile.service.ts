@@ -6,6 +6,7 @@ import { PhotoResponse } from '@/photo/dto/photo-response.dto';
 import { PrismaService } from '@/prisma/prisma.service';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { User } from '@prisma/client';
+import { ProfileFollowResponse } from './dto/profile-follow-response.dto';
 import { ProfileResponse } from './dto/profile-response.dto';
 
 @Injectable()
@@ -157,5 +158,49 @@ export class ProfileService {
     }
 
     return new PhotoResponse(photo);
+  }
+
+  async follow(username: string, user: User) {
+    const target = await this.prisma.user.findUnique({
+      where: {
+        username,
+      },
+    });
+
+    if (!target) {
+      throw new NotFoundException('target is not found');
+    }
+
+    await this.prisma.follow.create({
+      data: {
+        followerId: user.id,
+        followingId: target.id,
+      },
+    });
+
+    return new ProfileFollowResponse(true);
+  }
+
+  async unfollow(username: string, user: User) {
+    const target = await this.prisma.user.findUnique({
+      where: {
+        username,
+      },
+    });
+
+    if (!target) {
+      throw new NotFoundException('target is not found');
+    }
+
+    await this.prisma.follow.delete({
+      where: {
+        followerId_followingId: {
+          followerId: user.id,
+          followingId: target.id,
+        },
+      },
+    });
+
+    return new ProfileFollowResponse(false);
   }
 }
