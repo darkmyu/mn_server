@@ -261,18 +261,11 @@ export class PhotoService {
     }
 
     await this.prisma.$transaction(async (tx) => {
-      await tx.photoLike.upsert({
-        where: {
-          userId_photoId: {
-            userId: user.id,
-            photoId: id,
-          },
-        },
-        create: {
+      await tx.photoLike.create({
+        data: {
           userId: user.id,
-          photoId: id,
+          photoId: photo.id,
         },
-        update: {},
       });
 
       const { likes } = await tx.photo.update({
