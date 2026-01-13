@@ -1,5 +1,6 @@
 import { GetUser } from '@/auth/decorator/get-user.decorator';
 import { ApiOkResponsePagination } from '@/common/decorator/api-ok-response-pagination.dto';
+import { PaginationQuery } from '@/common/dto/pagination-query.dto';
 import { FileResponse } from '@/file/dto/file-response.dto';
 import {
   Body,
@@ -12,6 +13,7 @@ import {
   ParseFilePipe,
   Post,
   Put,
+  Query,
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
@@ -29,8 +31,8 @@ export class AnimalController {
 
   @ApiOkResponsePagination(AnimalResponse)
   @Get()
-  async all(@GetUser() user: User) {
-    return this.animalService.all(user);
+  async all(@Query() query: PaginationQuery, @GetUser() user: User) {
+    return this.animalService.all(query, user);
   }
 
   @ApiOkResponse({

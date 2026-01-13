@@ -1,3 +1,4 @@
+import { PaginationQuery } from '@/common/dto/pagination-query.dto';
 import { Pagination } from '@/common/dto/pagination.dto';
 import { ConverterService } from '@/converter/converter.service';
 import { FileService } from '@/file/file.service';
@@ -16,22 +17,35 @@ export class AnimalService {
     private readonly converterService: ConverterService,
   ) {}
 
-  async all(user: User) {
-    const raws = await this.prisma.animal.findMany({
-      where: {
-        userId: user.id,
-      },
-      include: {
-        user: true,
-        breed: true,
-      },
-      orderBy: {
-        createdAt: 'asc',
-      },
-    });
+  async all(query: PaginationQuery, user: User) {
+    const { page, limit } = query;
 
-    const animals = raws.map((raw) => new AnimalResponse(raw));
-    return new Pagination(animals, 1, animals.length, animals.length, false);
+    const [total, animals] = await this.prisma.$transaction([
+      this.prisma.animal.count({
+        where: {
+          userId: user.id,
+        },
+      }),
+      this.prisma.animal.findMany({
+        where: {
+          userId: user.id,
+        },
+        include: {
+          user: true,
+          breed: true,
+        },
+        take: limit,
+        skip: (page - 1) * limit,
+        orderBy: {
+          id: 'asc',
+        },
+      }),
+    ]);
+
+    const items = animals.map((animal) => new AnimalResponse(animal));
+    const hasNextPage = page * limit < total;
+
+    return new Pagination(items, page, total, limit, hasNextPage);
   }
 
   async read(id: number, user: User) {

@@ -1,24 +1,37 @@
 import { Pagination } from '@/common/dto/pagination.dto';
 import { PrismaService } from '@/prisma/prisma.service';
 import { Injectable } from '@nestjs/common';
-import { Species } from '@prisma/client';
+import { BreedListQuery } from './dto/breed-list-query.dto';
 import { BreedResponse } from './dto/breed-response.dto';
 
 @Injectable()
 export class BreedService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async read(species?: Species) {
-    const raws = await this.prisma.breed.findMany({
-      where: {
-        species,
-      },
-      orderBy: {
-        name: 'asc',
-      },
-    });
+  async all(query: BreedListQuery) {
+    const { page, limit, species } = query;
 
-    const breeds = raws.map((breed) => new BreedResponse(breed));
-    return new Pagination(breeds, 1, breeds.length, breeds.length, false);
+    const [total, breeds] = await this.prisma.$transaction([
+      this.prisma.breed.count({
+        where: {
+          species,
+        },
+      }),
+      this.prisma.breed.findMany({
+        where: {
+          species,
+        },
+        take: limit,
+        skip: (page - 1) * limit,
+        orderBy: {
+          name: 'asc',
+        },
+      }),
+    ]);
+
+    const items = breeds.map((breed) => new BreedResponse(breed));
+    const hasNextPage = page * limit < total;
+
+    return new Pagination(items, page, total, limit, hasNextPage);
   }
 }

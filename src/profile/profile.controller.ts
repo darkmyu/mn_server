@@ -5,6 +5,7 @@ import { Public } from '@/auth/decorator/public.decorator';
 import { ApiOkResponseCursorPagination } from '@/common/decorator/api-ok-response-cursor-pagination.dto';
 import { ApiOkResponsePagination } from '@/common/decorator/api-ok-response-pagination.dto';
 import { CursorPaginationQuery } from '@/common/dto/cursor-pagination-query.dto';
+import { PaginationQuery } from '@/common/dto/pagination-query.dto';
 import { PhotoResponse } from '@/photo/dto/photo-response.dto';
 import { Controller, Delete, Get, Param, Post, Query } from '@nestjs/common';
 import { ApiOkResponse } from '@nestjs/swagger';
@@ -28,8 +29,8 @@ export class ProfileController {
   @ApiOkResponsePagination(AnimalResponse)
   @Public()
   @Get(':username/animals')
-  async animals(@Param('username') username: string) {
-    return this.profileService.animals(username);
+  async animals(@Param('username') username: string, @Query() query: PaginationQuery) {
+    return this.profileService.animals(username, query);
   }
 
   @ApiOkResponseCursorPagination(PhotoResponse)

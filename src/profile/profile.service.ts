@@ -1,6 +1,7 @@
 import { AnimalResponse } from '@/animal/dto/animal-response.dto';
 import { CursorPaginationQuery } from '@/common/dto/cursor-pagination-query.dto';
 import { CursorPagination } from '@/common/dto/cursor-pagination.dto';
+import { PaginationQuery } from '@/common/dto/pagination-query.dto';
 import { Pagination } from '@/common/dto/pagination.dto';
 import { PhotoResponse } from '@/photo/dto/photo-response.dto';
 import { PrismaService } from '@/prisma/prisma.service';
@@ -27,21 +28,12 @@ export class ProfileService {
     return new ProfileResponse(user);
   }
 
-  async animals(username: string) {
+  async animals(username: string, query: PaginationQuery) {
+    const { page, limit } = query;
+
     const user = await this.prisma.user.findUnique({
       where: {
         username,
-      },
-      select: {
-        animals: {
-          include: {
-            user: true,
-            breed: true,
-          },
-          orderBy: {
-            createdAt: 'asc',
-          },
-        },
       },
     });
 
@@ -49,8 +41,32 @@ export class ProfileService {
       throw new NotFoundException('user is not found');
     }
 
-    const animals = user.animals.map((animal) => new AnimalResponse(animal));
-    return new Pagination(animals, 1, animals.length, animals.length, false);
+    const [total, animals] = await this.prisma.$transaction([
+      this.prisma.animal.count({
+        where: {
+          userId: user.id,
+        },
+      }),
+      this.prisma.animal.findMany({
+        where: {
+          userId: user.id,
+        },
+        include: {
+          user: true,
+          breed: true,
+        },
+        take: limit,
+        skip: (page - 1) * limit,
+        orderBy: {
+          id: 'asc',
+        },
+      }),
+    ]);
+
+    const items = animals.map((animal) => new AnimalResponse(animal));
+    const hasNextPage = page * limit < total;
+
+    return new Pagination(items, page, total, limit, hasNextPage);
   }
 
   async photos(username: string, query: CursorPaginationQuery, user: User | null) {
