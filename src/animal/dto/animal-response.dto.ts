@@ -1,5 +1,5 @@
 import { BreedResponse } from '@/breed/dto/breed-response.dto';
-import { ProfileResponse } from '@/profile/dto/profile-response.dto';
+import { UserResponse } from '@/user/dto/user-response.dto';
 import { ApiProperty } from '@nestjs/swagger';
 import { Gender, Prisma } from '@prisma/client';
 
@@ -27,7 +27,7 @@ export class AnimalResponse {
   thumbnail: string | null;
 
   @ApiProperty()
-  owner: ProfileResponse;
+  owner: UserResponse;
 
   @ApiProperty()
   breed: BreedResponse;
@@ -38,7 +38,7 @@ export class AnimalResponse {
     this.gender = animal.gender;
     this.birthday = animal.birthday;
     this.thumbnail = animal.thumbnail;
-    this.owner = new ProfileResponse(animal.user);
+    this.owner = new UserResponse(animal.user);
     this.breed = new BreedResponse(animal.breed);
   }
 }

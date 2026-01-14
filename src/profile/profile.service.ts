@@ -14,18 +14,41 @@ import { ProfileResponse } from './dto/profile-response.dto';
 export class ProfileService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async read(username: string) {
-    const user = await this.prisma.user.findUnique({
+  async read(username: string, user: User | null) {
+    const target = await this.prisma.user.findUnique({
       where: {
         username,
       },
+      include: {
+        _count: {
+          select: {
+            followers: true,
+            followings: true,
+          },
+        },
+      },
     });
 
-    if (!user) {
-      throw new NotFoundException('user is not found');
+    if (!target) {
+      throw new NotFoundException('target is not found');
     }
 
-    return new ProfileResponse(user);
+    let isFollowing = false;
+
+    if (user) {
+      const follow = await this.prisma.follow.findUnique({
+        where: {
+          followerId_followingId: {
+            followerId: user.id,
+            followingId: target.id,
+          },
+        },
+      });
+
+      isFollowing = !!follow;
+    }
+
+    return new ProfileResponse(target, isFollowing);
   }
 
   async animals(username: string, query: PaginationQuery) {

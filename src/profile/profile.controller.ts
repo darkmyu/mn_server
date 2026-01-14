@@ -20,10 +20,10 @@ export class ProfileController {
   @ApiOkResponse({
     type: ProfileResponse,
   })
-  @Public()
+  @IgnoreUnauthorized()
   @Get(':username')
-  async read(@Param('username') username: string) {
-    return this.profileService.read(username);
+  async read(@Param('username') username: string, @GetUser() user: User | null) {
+    return this.profileService.read(username, user);
   }
 
   @ApiOkResponsePagination(AnimalResponse)

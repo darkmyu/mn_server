@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { User } from '@prisma/client';
 
-export class AuthUserResponse {
+export class UserResponse {
   @ApiProperty()
   id: number;
 
