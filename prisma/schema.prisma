@@ -44,8 +44,8 @@ model User {
   animals    Animal[]
   photos     Photo[]
   photoLikes PhotoLike[]
-  followers  Follow[]    @relation("followers_relation")
-  followings Follow[]    @relation("followings_relation")
+  followers  Follow[]    @relation("followings_relation")
+  followings Follow[]    @relation("followers_relation")
 
   @@map("users")
 }
