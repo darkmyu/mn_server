@@ -4,7 +4,10 @@ import { Type } from 'class-transformer';
 import { IsArray, IsNotEmpty, IsNotEmptyObject, IsNumber, IsOptional, IsString, ValidateNested } from 'class-validator';
 
 export class PhotoCreateRequest {
-  @ApiProperty()
+  @ApiProperty({
+    isArray: true,
+    type: 'number',
+  })
   @IsArray()
   @IsNumber({}, { each: true })
   @IsNotEmpty()
