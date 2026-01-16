@@ -44,10 +44,24 @@ model User {
   animals    Animal[]
   photos     Photo[]
   photoLikes PhotoLike[]
-  followers  Follow[]    @relation("followings_relation")
-  followings Follow[]    @relation("followers_relation")
+  followers  UserFollow[] @relation("followings_relation")
+  followings UserFollow[] @relation("followers_relation")
 
   @@map("users")
+}
+
+model UserFollow {
+  followerId  Int @map("follower_id")
+  followingId Int @map("following_id")
+
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz()
+
+  follower  User @relation("followers_relation", fields: [followerId], references: [id], onDelete: Cascade)
+  following User @relation("followings_relation", fields: [followingId], references: [id], onDelete: Cascade)
+
+  @@id([followerId, followingId])
+  @@map("user_follows")
 }
 
 model Animal {
@@ -114,7 +128,7 @@ model Photo {
   photoImage PhotoImage?
   photoLikes PhotoLike[]
 
-  @@index([score(sort: Desc), id(sort: Desc)], map: "photos_score_id_desc_idx")
+  @@index([score(sort: Desc), id(sort: Desc)])
   @@map("photos")
 }
 
@@ -150,28 +164,15 @@ model PhotoImage {
 }
 
 model PhotoLike {
-  id      Int @id @default(autoincrement())
   userId  Int @map("user_id")
   photoId Int @map("photo_id")
 
   createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz()
 
   user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
   photo Photo @relation(fields: [photoId], references: [id], onDelete: Cascade)
 
-  @@unique([userId, photoId], map: "photo_likes_user_id_photo_id_key")
+  @@id([userId, photoId])
   @@map("photo_likes")
-}
-
-model Follow {
-  followerId  Int @map("follower_id")
-  followingId Int @map("following_id")
-
-  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz()
-
-  follower  User @relation("followers_relation", fields: [followerId], references: [id], onDelete: Cascade)
-  following User @relation("followings_relation", fields: [followingId], references: [id], onDelete: Cascade)
-
-  @@id([followerId, followingId])
-  @@map("follows")
 }
