@@ -79,7 +79,7 @@ model Animal {
   user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
   breed Breed @relation(fields: [breedId], references: [id])
 
-  photos Photo[]
+  photoAnimals PhotoAnimal[]
 
   @@map("animals")
 }
@@ -110,9 +110,8 @@ model Tag {
 }
 
 model Photo {
-  id       Int @id @default(autoincrement())
-  userId   Int @map("user_id")
-  animalId Int @map("animal_id")
+  id     Int @id @default(autoincrement())
+  userId Int @map("user_id")
 
   title       String?
   description String?
@@ -121,12 +120,12 @@ model Photo {
   createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz()
   updatedAt   DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz()
 
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  animal Animal @relation(fields: [animalId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  photoTags  PhotoTag[]
-  photoImage PhotoImage?
-  photoLikes PhotoLike[]
+  photoTags    PhotoTag[]
+  photoImage   PhotoImage?
+  photoLikes   PhotoLike[]
+  photoAnimals PhotoAnimal[]
 
   @@index([score(sort: Desc), id(sort: Desc)])
   @@map("photos")
@@ -175,4 +174,18 @@ model PhotoLike {
 
   @@id([userId, photoId])
   @@map("photo_likes")
+}
+
+model PhotoAnimal {
+  photoId  Int @map("photo_id")
+  animalId Int @map("animal_id")
+
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz()
+
+  photo  Photo  @relation(fields: [photoId], references: [id], onDelete: Cascade)
+  animal Animal @relation(fields: [animalId], references: [id], onDelete: Cascade)
+
+  @@id([photoId, animalId])
+  @@map("photo_animals")
 }

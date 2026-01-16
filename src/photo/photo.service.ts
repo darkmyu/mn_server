@@ -28,10 +28,14 @@ export class PhotoService {
         include: {
           user: true,
           photoImage: true,
-          animal: {
+          photoAnimals: {
             include: {
-              user: true,
-              breed: true,
+              animal: {
+                include: {
+                  user: true,
+                  breed: true,
+                },
+              },
             },
           },
           photoTags: {
@@ -71,10 +75,14 @@ export class PhotoService {
       include: {
         user: true,
         photoImage: true,
-        animal: {
+        photoAnimals: {
           include: {
-            user: true,
-            breed: true,
+            animal: {
+              include: {
+                user: true,
+                breed: true,
+              },
+            },
           },
         },
         photoTags: {
@@ -102,24 +110,31 @@ export class PhotoService {
   }
 
   async create(user: User, request: PhotoCreateRequest) {
-    const animal = await this.prisma.animal.findUnique({
+    const animals = await this.prisma.animal.findMany({
       where: {
-        id: request.animalId,
+        id: {
+          in: request.animalIds,
+        },
       },
     });
 
-    if (!animal) {
-      throw new NotFoundException('animal is not found');
+    if (animals.length !== request.animalIds.length) {
+      throw new NotFoundException('one or more animals are not found');
     }
 
-    if (animal.userId !== user.id) {
-      throw new UnauthorizedException('you are not the owner of this animal');
+    const isOwnedAnimals = animals.every((animal) => animal.userId === user.id);
+    if (!isOwnedAnimals) {
+      throw new UnauthorizedException('you are not the owner of some animals');
     }
 
     const photo = await this.prisma.photo.create({
       data: {
         userId: user.id,
-        animalId: request.animalId,
+        photoAnimals: {
+          create: request.animalIds.map((animalId) => ({
+            animalId,
+          })),
+        },
         photoImage: {
           create: {
             path: request.image.path,
@@ -151,10 +166,14 @@ export class PhotoService {
       include: {
         user: true,
         photoImage: true,
-        animal: {
+        photoAnimals: {
           include: {
-            user: true,
-            breed: true,
+            animal: {
+              include: {
+                user: true,
+                breed: true,
+              },
+            },
           },
         },
         photoTags: {
@@ -188,13 +207,35 @@ export class PhotoService {
       throw new UnauthorizedException('you are not the owner of this photo');
     }
 
+    const animals = await this.prisma.animal.findMany({
+      where: {
+        id: {
+          in: request.animalIds,
+        },
+      },
+    });
+
+    if (animals.length !== request.animalIds.length) {
+      throw new NotFoundException('one or more animals are not found');
+    }
+
+    const isOwnedAnimals = animals.every((animal) => animal.userId === user.id);
+    if (!isOwnedAnimals) {
+      throw new UnauthorizedException('you are not the owner of some animals');
+    }
+
     const updatedPhoto = await this.prisma.photo.update({
       where: {
         id,
       },
       data: {
         userId: user.id,
-        animalId: request.animalId,
+        photoAnimals: {
+          deleteMany: {},
+          create: request.animalIds.map((animalId) => ({
+            animalId,
+          })),
+        },
         photoImage: {
           update: {
             path: request.image.path,
@@ -227,10 +268,14 @@ export class PhotoService {
       include: {
         user: true,
         photoImage: true,
-        animal: {
+        photoAnimals: {
           include: {
-            user: true,
-            breed: true,
+            animal: {
+              include: {
+                user: true,
+                breed: true,
+              },
+            },
           },
         },
         photoTags: {

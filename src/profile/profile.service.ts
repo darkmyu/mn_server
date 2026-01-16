@@ -36,7 +36,7 @@ export class ProfileService {
     let isFollowing = false;
 
     if (user) {
-      const follow = await this.prisma.follow.findUnique({
+      const follow = await this.prisma.userFollow.findUnique({
         where: {
           followerId_followingId: {
             followerId: user.id,
@@ -118,10 +118,14 @@ export class ProfileService {
         include: {
           user: true,
           photoImage: true,
-          animal: {
+          photoAnimals: {
             include: {
-              user: true,
-              breed: true,
+              animal: {
+                include: {
+                  user: true,
+                  breed: true,
+                },
+              },
             },
           },
           photoTags: {
@@ -173,10 +177,14 @@ export class ProfileService {
       include: {
         user: true,
         photoImage: true,
-        animal: {
+        photoAnimals: {
           include: {
-            user: true,
-            breed: true,
+            animal: {
+              include: {
+                user: true,
+                breed: true,
+              },
+            },
           },
         },
         photoTags: {
@@ -210,7 +218,7 @@ export class ProfileService {
       throw new NotFoundException('target is not found');
     }
 
-    await this.prisma.follow.create({
+    await this.prisma.userFollow.create({
       data: {
         followerId: user.id,
         followingId: target.id,
@@ -231,7 +239,7 @@ export class ProfileService {
       throw new NotFoundException('target is not found');
     }
 
-    await this.prisma.follow.delete({
+    await this.prisma.userFollow.delete({
       where: {
         followerId_followingId: {
           followerId: user.id,

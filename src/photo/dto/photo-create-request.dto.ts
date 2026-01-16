@@ -5,9 +5,10 @@ import { IsArray, IsNotEmpty, IsNotEmptyObject, IsNumber, IsOptional, IsString, 
 
 export class PhotoCreateRequest {
   @ApiProperty()
-  @IsNumber()
+  @IsArray()
+  @IsNumber({}, { each: true })
   @IsNotEmpty()
-  animalId: number;
+  animalIds: number[];
 
   @ApiProperty()
   @IsNotEmptyObject()

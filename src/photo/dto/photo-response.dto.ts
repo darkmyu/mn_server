@@ -39,18 +39,25 @@ export class PhotoResponse {
   @ApiProperty()
   author: UserResponse;
 
-  @ApiProperty()
-  animal: AnimalResponse;
+  @ApiProperty({
+    isArray: true,
+    type: AnimalResponse,
+  })
+  animals: AnimalResponse[];
 
   constructor(
     photo: Prisma.PhotoGetPayload<{
       include: {
         user: true;
         photoImage: true;
-        animal: {
+        photoAnimals: {
           include: {
-            user: true;
-            breed: true;
+            animal: {
+              include: {
+                user: true;
+                breed: true;
+              };
+            };
           };
         };
         photoTags: {
@@ -69,7 +76,7 @@ export class PhotoResponse {
     this.liked = photo.photoLikes.length > 0;
     this.tags = photo.photoTags.map(({ tag }) => new TagResponse(tag));
     this.author = new UserResponse(photo.user);
-    this.animal = new AnimalResponse(photo.animal);
+    this.animals = photo.photoAnimals.map(({ animal }) => new AnimalResponse(animal));
 
     if (photo.photoImage) {
       this.image = new FileResponse(
