@@ -45,7 +45,7 @@ export class PhotoService {
           },
           photoLikes: {
             where: {
-              userId: user?.id,
+              userId: user ? user.id : -1,
             },
           },
         },
@@ -92,7 +92,7 @@ export class PhotoService {
         },
         photoLikes: {
           where: {
-            userId: user.id,
+            userId: user ? user.id : -1,
           },
         },
       },

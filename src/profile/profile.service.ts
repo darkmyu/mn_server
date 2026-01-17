@@ -135,7 +135,7 @@ export class ProfileService {
           },
           photoLikes: {
             where: {
-              userId: user?.id,
+              userId: user ? user.id : -1,
             },
           },
         },
@@ -194,7 +194,7 @@ export class ProfileService {
         },
         photoLikes: {
           where: {
-            userId: user?.id,
+            userId: user ? user.id : -1,
           },
         },
       },
