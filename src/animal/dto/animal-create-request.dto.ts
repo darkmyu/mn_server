@@ -25,8 +25,11 @@ export class AnimalCreateRequest {
   @IsNotEmpty()
   birthday: string;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({
+    type: 'string',
+    nullable: true,
+  })
   @IsString()
   @IsOptional()
-  thumbnail?: string;
+  thumbnail?: string | null;
 }

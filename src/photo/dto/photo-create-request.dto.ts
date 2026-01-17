@@ -19,12 +19,18 @@ export class PhotoCreateRequest {
   @Type(() => FileRequest)
   image: FileRequest;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({
+    nullable: true,
+    type: 'string',
+  })
   @IsString()
   @IsOptional()
-  title?: string;
+  title?: string | null;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({
+    nullable: true,
+    type: 'string',
+  })
   @IsString()
   @IsOptional()
   description?: string;
