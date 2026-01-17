@@ -4,7 +4,7 @@ import { ConverterService } from '@/converter/converter.service';
 import { FileService } from '@/file/file.service';
 import { PrismaService } from '@/prisma/prisma.service';
 import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
-import { User } from '@prisma/client';
+import { Prisma, User } from '@prisma/client';
 import { PhotoCreateRequest } from './dto/photo-create-request.dto';
 import { PhotoListQuery, PhotoSort } from './dto/photo-list-query.dto';
 import { PhotoResponse } from './dto/photo-response.dto';
@@ -51,7 +51,7 @@ export class PhotoService {
         },
         take: limit + 1,
         skip: cursor ? 1 : 0,
-        cursor: cursor ? { id: cursor } : undefined,
+        cursor: cursor ? { id: cursor } : Prisma.skip,
         orderBy: sort === PhotoSort.POPULAR ? [{ score: 'desc' }, { id: 'desc' }] : [{ id: 'desc' }],
       }),
     ]);

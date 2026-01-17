@@ -6,7 +6,7 @@ import { Pagination } from '@/common/dto/pagination.dto';
 import { PhotoResponse } from '@/photo/dto/photo-response.dto';
 import { PrismaService } from '@/prisma/prisma.service';
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { User } from '@prisma/client';
+import { Prisma, User } from '@prisma/client';
 import { ProfileFollowResponse } from './dto/profile-follow-response.dto';
 import { ProfileResponse } from './dto/profile-response.dto';
 
@@ -141,7 +141,7 @@ export class ProfileService {
         },
         take: limit + 1,
         skip: cursor ? 1 : 0,
-        cursor: cursor ? { id: cursor } : undefined,
+        cursor: cursor ? { id: cursor } : Prisma.skip,
         orderBy: {
           id: 'desc',
         },
