@@ -42,7 +42,7 @@ export class AnimalService {
       }),
     ]);
 
-    const items = animals.map((animal) => new AnimalResponse(animal));
+    const items = animals.map((animal) => new AnimalResponse(animal, animal.user, animal.breed));
     const hasNextPage = page * limit < total;
 
     return new Pagination(items, page, total, limit, hasNextPage);
@@ -67,7 +67,7 @@ export class AnimalService {
       throw new UnauthorizedException('you are not the owner of this animal');
     }
 
-    return new AnimalResponse(animal);
+    return new AnimalResponse(animal, animal.user, animal.breed);
   }
 
   async create(user: User, request: AnimalCreateRequest) {
@@ -86,7 +86,7 @@ export class AnimalService {
       },
     });
 
-    return new AnimalResponse(animal);
+    return new AnimalResponse(animal, animal.user, animal.breed);
   }
 
   async update(id: number, user: User, request: AnimalUpdateRequest) {
@@ -121,7 +121,7 @@ export class AnimalService {
       },
     });
 
-    return new AnimalResponse(updatedAnimal);
+    return new AnimalResponse(updatedAnimal, updatedAnimal.user, updatedAnimal.breed);
   }
 
   async delete(id: number, user: User) {
@@ -149,7 +149,7 @@ export class AnimalService {
       },
     });
 
-    return new AnimalResponse(deletedAnimal);
+    return new AnimalResponse(deletedAnimal, deletedAnimal.user, deletedAnimal.breed);
   }
 
   async upload(thumbnail: Express.Multer.File) {

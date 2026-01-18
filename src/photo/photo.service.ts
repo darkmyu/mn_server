@@ -61,7 +61,18 @@ export class PhotoService {
       photos.pop();
     }
 
-    const items = photos.map((photo) => new PhotoResponse(photo));
+    const items = photos.map(
+      (photo) =>
+        new PhotoResponse(
+          photo,
+          photo.photoImage,
+          photo.user,
+          photo.photoTags.map(({ tag }) => tag),
+          photo.photoAnimals.map(({ animal }) => animal),
+          photo.photoLikes.length > 0,
+        ),
+    );
+
     const nextCursor = hasNextPage ? photos[photos.length - 1].id : null;
 
     return new CursorPagination(items, nextCursor, total, limit, hasNextPage);
@@ -106,7 +117,14 @@ export class PhotoService {
       throw new UnauthorizedException('you are not the owner of this photo');
     }
 
-    return new PhotoResponse(photo);
+    return new PhotoResponse(
+      photo,
+      photo.photoImage,
+      photo.user,
+      photo.photoTags.map(({ tag }) => tag),
+      photo.photoAnimals.map(({ animal }) => animal),
+      photo.photoLikes.length > 0,
+    );
   }
 
   async create(user: User, request: PhotoCreateRequest) {
@@ -189,7 +207,14 @@ export class PhotoService {
       },
     });
 
-    return new PhotoResponse(photo);
+    return new PhotoResponse(
+      photo,
+      photo.photoImage,
+      photo.user,
+      photo.photoTags.map(({ tag }) => tag),
+      photo.photoAnimals.map(({ animal }) => animal),
+      photo.photoLikes.length > 0,
+    );
   }
 
   async update(id: number, user: User, request: PhotoUpdateRequest) {
@@ -291,7 +316,14 @@ export class PhotoService {
       },
     });
 
-    return new PhotoResponse(updatedPhoto);
+    return new PhotoResponse(
+      updatedPhoto,
+      updatedPhoto.photoImage,
+      updatedPhoto.user,
+      updatedPhoto.photoTags.map(({ tag }) => tag),
+      updatedPhoto.photoAnimals.map(({ animal }) => animal),
+      updatedPhoto.photoLikes.length > 0,
+    );
   }
 
   async like(id: number, user: User) {
