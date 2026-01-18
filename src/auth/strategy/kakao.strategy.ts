@@ -10,8 +10,11 @@ import { OAuthUser } from '../interface/auth.interface';
 interface KakaoProfile extends Profile {
   _json: {
     id: number;
-    properties: {
-      profile_image: string;
+    kakao_account: {
+      email: string;
+      profile: {
+        profile_image_url: string;
+      };
     };
   };
 }
@@ -30,12 +33,13 @@ export class KakaoStrategy extends PassportStrategy(Strategy, 'kakao') {
   }
 
   async validate(_accessToken: string, _refreshToken: string, profile: KakaoProfile) {
-    const { id, properties } = profile._json;
+    const { id, kakao_account } = profile._json;
 
     const oauthUser: OAuthUser = {
+      email: kakao_account.email,
       provider: Provider.KAKAO,
       providerId: id.toString(),
-      profileImage: properties.profile_image,
+      profileImage: kakao_account.profile.profile_image_url,
     };
 
     const user = await this.authService.validateOAuthUser(oauthUser);

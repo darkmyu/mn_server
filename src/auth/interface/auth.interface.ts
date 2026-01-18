@@ -1,10 +1,10 @@
 import { Provider } from '@prisma/client';
 
 export interface OAuthUser {
-  email?: string;
+  email: string | null;
   provider: Provider;
   providerId: string;
-  profileImage?: string;
+  profileImage: string | null;
 }
 
 export interface TokenPayload {

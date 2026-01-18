@@ -25,10 +25,10 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
     const { sub, email, picture } = profile._json;
 
     const oauthUser: OAuthUser = {
-      email,
+      email: email ?? null,
       provider: Provider.GOOGLE,
       providerId: sub,
-      profileImage: picture,
+      profileImage: picture ?? null,
     };
 
     const user = await this.authService.validateOAuthUser(oauthUser);
