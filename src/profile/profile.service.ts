@@ -106,7 +106,21 @@ export class ProfileService {
           userId: author.id,
         },
         include: {
-          user: true,
+          user: {
+            include: {
+              _count: {
+                select: {
+                  followers: true,
+                  followings: true,
+                },
+              },
+              followers: {
+                where: {
+                  followerId: user ? user.id : -1,
+                },
+              },
+            },
+          },
           photoImage: true,
           photoAnimals: {
             include: {
@@ -145,14 +159,17 @@ export class ProfileService {
 
     const items = photos.map(
       (photo) =>
-        new PhotoResponse(
+        new PhotoResponse({
           photo,
-          photo.photoImage,
-          photo.user,
-          photo.photoTags.map(({ tag }) => tag),
-          photo.photoAnimals.map(({ animal }) => animal),
-          photo.photoLikes.length > 0,
-        ),
+          image: photo.photoImage,
+          author: photo.user,
+          tags: photo.photoTags.map(({ tag }) => tag),
+          animals: photo.photoAnimals.map(({ animal }) => animal),
+          liked: photo.photoLikes.length > 0,
+          followers: photo.user._count.followers,
+          followings: photo.user._count.followings,
+          isFollowing: photo.user.followers.length > 0,
+        }),
     );
 
     const nextCursor = hasNextPage ? photos[photos.length - 1].id : null;
@@ -176,7 +193,21 @@ export class ProfileService {
         id,
       },
       include: {
-        user: true,
+        user: {
+          include: {
+            _count: {
+              select: {
+                followers: true,
+                followings: true,
+              },
+            },
+            followers: {
+              where: {
+                followerId: user ? user.id : -1,
+              },
+            },
+          },
+        },
         photoImage: true,
         photoAnimals: {
           include: {
@@ -205,14 +236,17 @@ export class ProfileService {
       throw new NotFoundException('photo is not found');
     }
 
-    return new PhotoResponse(
+    return new PhotoResponse({
       photo,
-      photo.photoImage,
-      photo.user,
-      photo.photoTags.map(({ tag }) => tag),
-      photo.photoAnimals.map(({ animal }) => animal),
-      photo.photoLikes.length > 0,
-    );
+      image: photo.photoImage,
+      author: photo.user,
+      tags: photo.photoTags.map(({ tag }) => tag),
+      animals: photo.photoAnimals.map(({ animal }) => animal),
+      liked: photo.photoLikes.length > 0,
+      followers: photo.user._count.followers,
+      followings: photo.user._count.followings,
+      isFollowing: photo.user.followers.length > 0,
+    });
   }
 
   async follow(username: string, user: User) {

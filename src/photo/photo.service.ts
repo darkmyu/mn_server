@@ -26,7 +26,21 @@ export class PhotoService {
       this.prisma.photo.count(),
       this.prisma.photo.findMany({
         include: {
-          user: true,
+          user: {
+            include: {
+              _count: {
+                select: {
+                  followers: true,
+                  followings: true,
+                },
+              },
+              followers: {
+                where: {
+                  followerId: user ? user.id : -1,
+                },
+              },
+            },
+          },
           photoImage: true,
           photoAnimals: {
             include: {
@@ -63,14 +77,17 @@ export class PhotoService {
 
     const items = photos.map(
       (photo) =>
-        new PhotoResponse(
+        new PhotoResponse({
           photo,
-          photo.photoImage,
-          photo.user,
-          photo.photoTags.map(({ tag }) => tag),
-          photo.photoAnimals.map(({ animal }) => animal),
-          photo.photoLikes.length > 0,
-        ),
+          image: photo.photoImage,
+          author: photo.user,
+          tags: photo.photoTags.map(({ tag }) => tag),
+          animals: photo.photoAnimals.map(({ animal }) => animal),
+          liked: photo.photoLikes.length > 0,
+          followers: photo.user._count.followers,
+          followings: photo.user._count.followings,
+          isFollowing: photo.user.followers.length > 0,
+        }),
     );
 
     const nextCursor = hasNextPage ? photos[photos.length - 1].id : null;
@@ -84,7 +101,21 @@ export class PhotoService {
         id,
       },
       include: {
-        user: true,
+        user: {
+          include: {
+            _count: {
+              select: {
+                followers: true,
+                followings: true,
+              },
+            },
+            followers: {
+              where: {
+                followerId: user ? user.id : -1,
+              },
+            },
+          },
+        },
         photoImage: true,
         photoAnimals: {
           include: {
@@ -103,7 +134,7 @@ export class PhotoService {
         },
         photoLikes: {
           where: {
-            userId: user ? user.id : -1,
+            userId: user.id,
           },
         },
       },
@@ -117,14 +148,17 @@ export class PhotoService {
       throw new UnauthorizedException('you are not the owner of this photo');
     }
 
-    return new PhotoResponse(
+    return new PhotoResponse({
       photo,
-      photo.photoImage,
-      photo.user,
-      photo.photoTags.map(({ tag }) => tag),
-      photo.photoAnimals.map(({ animal }) => animal),
-      photo.photoLikes.length > 0,
-    );
+      image: photo.photoImage,
+      author: photo.user,
+      tags: photo.photoTags.map(({ tag }) => tag),
+      animals: photo.photoAnimals.map(({ animal }) => animal),
+      liked: photo.photoLikes.length > 0,
+      followers: photo.user._count.followers,
+      followings: photo.user._count.followings,
+      isFollowing: photo.user.followers.length > 0,
+    });
   }
 
   async create(user: User, request: PhotoCreateRequest) {
@@ -182,7 +216,21 @@ export class PhotoService {
         }),
       },
       include: {
-        user: true,
+        user: {
+          include: {
+            _count: {
+              select: {
+                followers: true,
+                followings: true,
+              },
+            },
+            followers: {
+              where: {
+                followerId: user ? user.id : -1,
+              },
+            },
+          },
+        },
         photoImage: true,
         photoAnimals: {
           include: {
@@ -207,14 +255,17 @@ export class PhotoService {
       },
     });
 
-    return new PhotoResponse(
+    return new PhotoResponse({
       photo,
-      photo.photoImage,
-      photo.user,
-      photo.photoTags.map(({ tag }) => tag),
-      photo.photoAnimals.map(({ animal }) => animal),
-      photo.photoLikes.length > 0,
-    );
+      image: photo.photoImage,
+      author: photo.user,
+      tags: photo.photoTags.map(({ tag }) => tag),
+      animals: photo.photoAnimals.map(({ animal }) => animal),
+      liked: photo.photoLikes.length > 0,
+      followers: photo.user._count.followers,
+      followings: photo.user._count.followings,
+      isFollowing: photo.user.followers.length > 0,
+    });
   }
 
   async update(id: number, user: User, request: PhotoUpdateRequest) {
@@ -291,7 +342,21 @@ export class PhotoService {
         }),
       },
       include: {
-        user: true,
+        user: {
+          include: {
+            _count: {
+              select: {
+                followers: true,
+                followings: true,
+              },
+            },
+            followers: {
+              where: {
+                followerId: user ? user.id : -1,
+              },
+            },
+          },
+        },
         photoImage: true,
         photoAnimals: {
           include: {
@@ -316,14 +381,17 @@ export class PhotoService {
       },
     });
 
-    return new PhotoResponse(
-      updatedPhoto,
-      updatedPhoto.photoImage,
-      updatedPhoto.user,
-      updatedPhoto.photoTags.map(({ tag }) => tag),
-      updatedPhoto.photoAnimals.map(({ animal }) => animal),
-      updatedPhoto.photoLikes.length > 0,
-    );
+    return new PhotoResponse({
+      photo,
+      image: updatedPhoto.photoImage,
+      author: updatedPhoto.user,
+      tags: updatedPhoto.photoTags.map(({ tag }) => tag),
+      animals: updatedPhoto.photoAnimals.map(({ animal }) => animal),
+      liked: updatedPhoto.photoLikes.length > 0,
+      followers: updatedPhoto.user._count.followers,
+      followings: updatedPhoto.user._count.followings,
+      isFollowing: updatedPhoto.user.followers.length > 0,
+    });
   }
 
   async like(id: number, user: User) {

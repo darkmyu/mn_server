@@ -1,9 +1,21 @@
 import { AnimalResponse } from '@/animal/dto/animal-response.dto';
 import { FileResponse } from '@/file/dto/file-response.dto';
+import { ProfileResponse } from '@/profile/dto/profile-response.dto';
 import { TagResponse } from '@/tag/dto/tag-response.dto';
-import { UserResponse } from '@/user/dto/user-response.dto';
 import { ApiProperty } from '@nestjs/swagger';
 import { Photo, PhotoImage, Prisma, Tag, User } from '@prisma/client';
+
+interface Params {
+  photo: Photo;
+  image: PhotoImage | null;
+  author: User;
+  tags: Tag[];
+  animals: Prisma.AnimalGetPayload<{ include: { user: true; breed: true } }>[];
+  liked: boolean;
+  followers: number;
+  followings: number;
+  isFollowing: boolean;
+}
 
 export class PhotoResponse {
   @ApiProperty()
@@ -43,24 +55,17 @@ export class PhotoResponse {
   animals: AnimalResponse[];
 
   @ApiProperty()
-  author: UserResponse;
+  author: ProfileResponse;
 
-  constructor(
-    photo: Photo,
-    image: PhotoImage | null,
-    author: User,
-    tags: Tag[],
-    animals: Prisma.AnimalGetPayload<{ include: { user: true; breed: true } }>[],
-    liked: boolean,
-  ) {
+  constructor({ photo, image, author, tags, animals, liked, followers, followings, isFollowing }: Params) {
     this.id = photo.id;
     this.title = photo.title;
     this.description = photo.description;
     this.likes = photo.likes;
     this.liked = liked;
-    this.author = new UserResponse(author);
     this.tags = tags.map((tag) => new TagResponse(tag));
     this.animals = animals.map((animal) => new AnimalResponse(animal, animal.user, animal.breed));
+    this.author = new ProfileResponse(author, followers, followings, isFollowing);
 
     if (image) {
       this.image = new FileResponse(image.path, image.size, image.width, image.height, image.mimetype);
