@@ -61,6 +61,14 @@ export class PhotoController {
     return this.photoService.update(id, user, request);
   }
 
+  @ApiOkResponse({
+    type: PhotoResponse,
+  })
+  @Delete(':id')
+  async delete(@Param('id') id: number, @GetUser() user: User) {
+    return this.photoService.delete(id, user);
+  }
+
   @ApiOkResponse()
   @Post(':id/likes')
   async like(@Param('id') id: number, @GetUser() user: User) {

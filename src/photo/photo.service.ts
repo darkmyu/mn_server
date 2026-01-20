@@ -394,6 +394,78 @@ export class PhotoService {
     });
   }
 
+  async delete(id: number, user: User) {
+    const photo = await this.prisma.photo.findUnique({
+      where: {
+        id,
+      },
+    });
+
+    if (!photo) {
+      throw new NotFoundException('photo is not found');
+    }
+
+    if (photo.userId !== user.id) {
+      throw new UnauthorizedException('you are not the owner of this photo');
+    }
+
+    const deletedPhoto = await this.prisma.photo.delete({
+      where: {
+        id,
+      },
+      include: {
+        user: {
+          include: {
+            _count: {
+              select: {
+                followers: true,
+                followings: true,
+              },
+            },
+            followers: {
+              where: {
+                followerId: user.id,
+              },
+            },
+          },
+        },
+        photoImage: true,
+        photoAnimals: {
+          include: {
+            animal: {
+              include: {
+                user: true,
+                breed: true,
+              },
+            },
+          },
+        },
+        photoTags: {
+          include: {
+            tag: true,
+          },
+        },
+        photoLikes: {
+          where: {
+            userId: user.id,
+          },
+        },
+      },
+    });
+
+    return new PhotoResponse({
+      photo: deletedPhoto,
+      image: deletedPhoto.photoImage,
+      author: deletedPhoto.user,
+      tags: deletedPhoto.photoTags.map(({ tag }) => tag),
+      animals: deletedPhoto.photoAnimals.map(({ animal }) => animal),
+      liked: deletedPhoto.photoLikes.length > 0,
+      followers: deletedPhoto.user._count.followers,
+      followings: deletedPhoto.user._count.followings,
+      isFollowing: deletedPhoto.user.followers.length > 0,
+    });
+  }
+
   async like(id: number, user: User) {
     const photo = await this.prisma.photo.findUnique({
       where: {
