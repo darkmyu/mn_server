@@ -29,7 +29,7 @@ export class BreedService {
       }),
     ]);
 
-    const items = breeds.map((breed) => new BreedResponse(breed));
+    const items = breeds.map((breed) => new BreedResponse({ breed }));
     const hasNextPage = page * limit < total;
 
     return new Pagination(items, page, total, limit, hasNextPage);

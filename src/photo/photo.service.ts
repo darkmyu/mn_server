@@ -75,20 +75,7 @@ export class PhotoService {
       photos.pop();
     }
 
-    const items = photos.map(
-      (photo) =>
-        new PhotoResponse({
-          photo,
-          image: photo.photoImage,
-          author: photo.user,
-          tags: photo.photoTags.map(({ tag }) => tag),
-          animals: photo.photoAnimals.map(({ animal }) => animal),
-          liked: photo.photoLikes.length > 0,
-          followers: photo.user._count.followers,
-          followings: photo.user._count.followings,
-          isFollowing: photo.user.followers.length > 0,
-        }),
-    );
+    const items = photos.map((photo) => new PhotoResponse({ photo }));
 
     const nextCursor = hasNextPage ? photos[photos.length - 1].id : null;
 
@@ -148,17 +135,7 @@ export class PhotoService {
       throw new UnauthorizedException('you are not the owner of this photo');
     }
 
-    return new PhotoResponse({
-      photo,
-      image: photo.photoImage,
-      author: photo.user,
-      tags: photo.photoTags.map(({ tag }) => tag),
-      animals: photo.photoAnimals.map(({ animal }) => animal),
-      liked: photo.photoLikes.length > 0,
-      followers: photo.user._count.followers,
-      followings: photo.user._count.followings,
-      isFollowing: photo.user.followers.length > 0,
-    });
+    return new PhotoResponse({ photo });
   }
 
   async create(user: User, request: PhotoCreateRequest) {
@@ -255,17 +232,7 @@ export class PhotoService {
       },
     });
 
-    return new PhotoResponse({
-      photo,
-      image: photo.photoImage,
-      author: photo.user,
-      tags: photo.photoTags.map(({ tag }) => tag),
-      animals: photo.photoAnimals.map(({ animal }) => animal),
-      liked: photo.photoLikes.length > 0,
-      followers: photo.user._count.followers,
-      followings: photo.user._count.followings,
-      isFollowing: photo.user.followers.length > 0,
-    });
+    return new PhotoResponse({ photo });
   }
 
   async update(id: number, user: User, request: PhotoUpdateRequest) {
@@ -381,17 +348,7 @@ export class PhotoService {
       },
     });
 
-    return new PhotoResponse({
-      photo,
-      image: updatedPhoto.photoImage,
-      author: updatedPhoto.user,
-      tags: updatedPhoto.photoTags.map(({ tag }) => tag),
-      animals: updatedPhoto.photoAnimals.map(({ animal }) => animal),
-      liked: updatedPhoto.photoLikes.length > 0,
-      followers: updatedPhoto.user._count.followers,
-      followings: updatedPhoto.user._count.followings,
-      isFollowing: updatedPhoto.user.followers.length > 0,
-    });
+    return new PhotoResponse({ photo: updatedPhoto });
   }
 
   async delete(id: number, user: User) {
@@ -453,17 +410,7 @@ export class PhotoService {
       },
     });
 
-    return new PhotoResponse({
-      photo: deletedPhoto,
-      image: deletedPhoto.photoImage,
-      author: deletedPhoto.user,
-      tags: deletedPhoto.photoTags.map(({ tag }) => tag),
-      animals: deletedPhoto.photoAnimals.map(({ animal }) => animal),
-      liked: deletedPhoto.photoLikes.length > 0,
-      followers: deletedPhoto.user._count.followers,
-      followings: deletedPhoto.user._count.followings,
-      isFollowing: deletedPhoto.user.followers.length > 0,
-    });
+    return new PhotoResponse({ photo: deletedPhoto });
   }
 
   async like(id: number, user: User) {

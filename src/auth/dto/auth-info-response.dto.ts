@@ -10,6 +10,6 @@ export class AuthInfoResponse {
   profile: UserResponse | null;
 
   constructor(user: User | null) {
-    this.profile = user ? new UserResponse(user) : null;
+    this.profile = user ? new UserResponse({ user }) : null;
   }
 }

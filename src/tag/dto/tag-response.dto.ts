@@ -1,6 +1,10 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Tag } from '@prisma/client';
 
+export interface TagResponseParams {
+  tag: Tag;
+}
+
 export class TagResponse {
   @ApiProperty()
   name: string;
@@ -8,7 +12,7 @@ export class TagResponse {
   @ApiProperty()
   slug: string;
 
-  constructor(tag: Tag) {
+  constructor({ tag }: TagResponseParams) {
     this.name = tag.name;
     this.slug = tag.slug;
   }

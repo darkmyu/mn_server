@@ -38,7 +38,7 @@ export class ProfileService {
       throw new NotFoundException('target is not found');
     }
 
-    return new ProfileResponse(target, target._count.followers, target._count.followings, target.followers.length > 0);
+    return new ProfileResponse({ user: target });
   }
 
   async animals(username: string, query: PaginationQuery) {
@@ -76,7 +76,7 @@ export class ProfileService {
       }),
     ]);
 
-    const items = animals.map((animal) => new AnimalResponse(animal, animal.user, animal.breed));
+    const items = animals.map((animal) => new AnimalResponse({ animal }));
     const hasNextPage = page * limit < total;
 
     return new Pagination(items, page, total, limit, hasNextPage);
@@ -157,21 +157,7 @@ export class ProfileService {
       photos.pop();
     }
 
-    const items = photos.map(
-      (photo) =>
-        new PhotoResponse({
-          photo,
-          image: photo.photoImage,
-          author: photo.user,
-          tags: photo.photoTags.map(({ tag }) => tag),
-          animals: photo.photoAnimals.map(({ animal }) => animal),
-          liked: photo.photoLikes.length > 0,
-          followers: photo.user._count.followers,
-          followings: photo.user._count.followings,
-          isFollowing: photo.user.followers.length > 0,
-        }),
-    );
-
+    const items = photos.map((photo) => new PhotoResponse({ photo }));
     const nextCursor = hasNextPage ? photos[photos.length - 1].id : null;
 
     return new CursorPagination(items, nextCursor, total, limit, hasNextPage);
@@ -236,17 +222,7 @@ export class ProfileService {
       throw new NotFoundException('photo is not found');
     }
 
-    return new PhotoResponse({
-      photo,
-      image: photo.photoImage,
-      author: photo.user,
-      tags: photo.photoTags.map(({ tag }) => tag),
-      animals: photo.photoAnimals.map(({ animal }) => animal),
-      liked: photo.photoLikes.length > 0,
-      followers: photo.user._count.followers,
-      followings: photo.user._count.followings,
-      isFollowing: photo.user.followers.length > 0,
-    });
+    return new PhotoResponse({ photo });
   }
 
   async follow(username: string, user: User) {

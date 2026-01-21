@@ -1,6 +1,10 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { User } from '@prisma/client';
 
+interface UserResponseParams {
+  user: User;
+}
+
 export class UserResponse {
   @ApiProperty()
   id: number;
@@ -17,7 +21,7 @@ export class UserResponse {
   })
   profileImage: string | null;
 
-  constructor(user: User) {
+  constructor({ user }: UserResponseParams) {
     this.id = user.id;
     this.username = user.username;
     this.nickname = user.nickname;

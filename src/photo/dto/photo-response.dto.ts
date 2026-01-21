@@ -3,18 +3,41 @@ import { FileResponse } from '@/file/dto/file-response.dto';
 import { ProfileResponse } from '@/profile/dto/profile-response.dto';
 import { TagResponse } from '@/tag/dto/tag-response.dto';
 import { ApiProperty } from '@nestjs/swagger';
-import { Photo, PhotoImage, Prisma, Tag, User } from '@prisma/client';
+import { Prisma } from '@prisma/client';
 
-interface Params {
-  photo: Photo;
-  image: PhotoImage | null;
-  author: User;
-  tags: Tag[];
-  animals: Prisma.AnimalGetPayload<{ include: { user: true; breed: true } }>[];
-  liked: boolean;
-  followers: number;
-  followings: number;
-  isFollowing: boolean;
+export interface PhotoResponseParams {
+  photo: Prisma.PhotoGetPayload<{
+    include: {
+      user: {
+        include: {
+          _count: {
+            select: {
+              followers: true;
+              followings: true;
+            };
+          };
+          followers: true;
+        };
+      };
+      photoImage: true;
+      photoAnimals: {
+        include: {
+          animal: {
+            include: {
+              user: true;
+              breed: true;
+            };
+          };
+        };
+      };
+      photoTags: {
+        include: {
+          tag: true;
+        };
+      };
+      photoLikes: true;
+    };
+  }>;
 }
 
 export class PhotoResponse {
@@ -57,18 +80,24 @@ export class PhotoResponse {
   @ApiProperty()
   author: ProfileResponse;
 
-  constructor({ photo, image, author, tags, animals, liked, followers, followings, isFollowing }: Params) {
+  constructor({ photo }: PhotoResponseParams) {
     this.id = photo.id;
     this.title = photo.title;
     this.description = photo.description;
     this.likes = photo.likes;
-    this.liked = liked;
-    this.tags = tags.map((tag) => new TagResponse(tag));
-    this.animals = animals.map((animal) => new AnimalResponse(animal, animal.user, animal.breed));
-    this.author = new ProfileResponse(author, followers, followings, isFollowing);
+    this.liked = photo.photoLikes.length > 0;
+    this.tags = photo.photoTags.map(({ tag }) => new TagResponse({ tag }));
+    this.animals = photo.photoAnimals.map(({ animal }) => new AnimalResponse({ animal }));
+    this.author = new ProfileResponse({ user: photo.user });
 
-    if (image) {
-      this.image = new FileResponse(image.path, image.size, image.width, image.height, image.mimetype);
+    if (photo.photoImage) {
+      this.image = new FileResponse(
+        photo.photoImage.path,
+        photo.photoImage.size,
+        photo.photoImage.width,
+        photo.photoImage.height,
+        photo.photoImage.mimetype,
+      );
     }
   }
 }
