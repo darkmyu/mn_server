@@ -38,7 +38,10 @@ export class ProfileService {
       throw new NotFoundException('target is not found');
     }
 
-    return new ProfileResponse({ user: target });
+    return new ProfileResponse({
+      user: target,
+      isOwner: target.id === user?.id,
+    });
   }
 
   async animals(username: string, query: PaginationQuery) {
@@ -157,7 +160,14 @@ export class ProfileService {
       photos.pop();
     }
 
-    const items = photos.map((photo) => new PhotoResponse({ photo }));
+    const items = photos.map(
+      (photo) =>
+        new PhotoResponse({
+          photo,
+          isOwner: photo.user.id === user?.id,
+        }),
+    );
+
     const nextCursor = hasNextPage ? photos[photos.length - 1].id : null;
 
     return new CursorPagination(items, nextCursor, total, limit, hasNextPage);
@@ -222,7 +232,10 @@ export class ProfileService {
       throw new NotFoundException('photo is not found');
     }
 
-    return new PhotoResponse({ photo });
+    return new PhotoResponse({
+      photo,
+      isOwner: photo.user.id === user?.id,
+    });
   }
 
   async follow(username: string, user: User) {

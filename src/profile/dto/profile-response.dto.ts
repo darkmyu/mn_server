@@ -13,6 +13,7 @@ export interface ProfileResponseParams {
       };
     };
   }>;
+  isOwner: boolean;
 }
 
 export class ProfileResponse {
@@ -40,7 +41,10 @@ export class ProfileResponse {
   @ApiProperty()
   isFollowing: boolean = false;
 
-  constructor({ user }: ProfileResponseParams) {
+  @ApiProperty()
+  isOwner: boolean = false;
+
+  constructor({ user, isOwner }: ProfileResponseParams) {
     this.id = user.id;
     this.username = user.username;
     this.nickname = user.nickname;
@@ -48,5 +52,6 @@ export class ProfileResponse {
     this.followers = user._count.followers;
     this.followings = user._count.followings;
     this.isFollowing = user.followers.length > 0;
+    this.isOwner = isOwner;
   }
 }

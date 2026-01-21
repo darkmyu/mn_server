@@ -38,6 +38,7 @@ export interface PhotoResponseParams {
       photoLikes: true;
     };
   }>;
+  isOwner: boolean;
 }
 
 export class PhotoResponse {
@@ -80,7 +81,7 @@ export class PhotoResponse {
   @ApiProperty()
   author: ProfileResponse;
 
-  constructor({ photo }: PhotoResponseParams) {
+  constructor({ photo, isOwner }: PhotoResponseParams) {
     this.id = photo.id;
     this.title = photo.title;
     this.description = photo.description;
@@ -88,7 +89,7 @@ export class PhotoResponse {
     this.liked = photo.photoLikes.length > 0;
     this.tags = photo.photoTags.map(({ tag }) => new TagResponse({ tag }));
     this.animals = photo.photoAnimals.map(({ animal }) => new AnimalResponse({ animal }));
-    this.author = new ProfileResponse({ user: photo.user });
+    this.author = new ProfileResponse({ user: photo.user, isOwner });
 
     if (photo.photoImage) {
       this.image = new FileResponse(
