@@ -41,11 +41,13 @@ model User {
   createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz()
   updatedAt    DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz()
 
-  animals    Animal[]
-  photos     Photo[]
-  photoLikes PhotoLike[]
-  followers  UserFollow[] @relation("followings_relation")
-  followings UserFollow[] @relation("followers_relation")
+  animals              Animal[]
+  photos               Photo[]
+  photoLikes           PhotoLike[]
+  followers            UserFollow[]   @relation("user_followings")
+  followings           UserFollow[]   @relation("user_followers")
+  photoComments        PhotoComment[] @relation("photo_comment_author")
+  photoMentionComments PhotoComment[] @relation("photo_comment_mention")
 
   @@map("users")
 }
@@ -57,8 +59,8 @@ model UserFollow {
   createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz()
   updatedAt DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz()
 
-  follower  User @relation("followers_relation", fields: [followerId], references: [id], onDelete: Cascade)
-  following User @relation("followings_relation", fields: [followingId], references: [id], onDelete: Cascade)
+  follower  User @relation("user_followers", fields: [followerId], references: [id], onDelete: Cascade)
+  following User @relation("user_followings", fields: [followingId], references: [id], onDelete: Cascade)
 
   @@id([followerId, followingId])
   @@map("user_follows")
@@ -122,10 +124,11 @@ model Photo {
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  photoTags    PhotoTag[]
-  photoImage   PhotoImage?
-  photoLikes   PhotoLike[]
-  photoAnimals PhotoAnimal[]
+  photoTags     PhotoTag[]
+  photoImage    PhotoImage?
+  photoLikes    PhotoLike[]
+  photoAnimals  PhotoAnimal[]
+  photoComments PhotoComment[]
 
   @@index([score(sort: Desc), id(sort: Desc)])
   @@map("photos")
@@ -188,4 +191,24 @@ model PhotoAnimal {
 
   @@id([photoId, animalId])
   @@map("photo_animals")
+}
+
+model PhotoComment {
+  id        Int  @id @default(autoincrement())
+  userId    Int  @map("user_id")
+  photoId   Int  @map("photo_id")
+  parentId  Int? @map("parent_id")
+  mentionId Int? @map("mention_id")
+
+  content   String
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz()
+
+  user    User           @relation("photo_comment_author", fields: [userId], references: [id], onDelete: Cascade)
+  photo   Photo          @relation(fields: [photoId], references: [id], onDelete: Cascade)
+  parent  PhotoComment?  @relation("photo_comment_replies", fields: [parentId], references: [id], onDelete: Cascade)
+  replies PhotoComment[] @relation("photo_comment_replies")
+  mention User?          @relation("photo_comment_mention", fields: [mentionId], references: [id], onDelete: SetNull)
+
+  @@map("photo_comments")
 }
