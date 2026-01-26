@@ -5,6 +5,9 @@ import { FileService } from '@/file/file.service';
 import { PrismaService } from '@/prisma/prisma.service';
 import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { Prisma, User } from '@prisma/client';
+import { PhotoCommentCreateRequest } from './dto/photo-comment-create-request.dto';
+import { PhotoCommentResponse } from './dto/photo-comment-response.dto';
+import { PhotoCommentUpdateRequest } from './dto/photo-comment-update-request.dto';
 import { PhotoCreateRequest } from './dto/photo-create-request.dto';
 import { PhotoListQuery, PhotoSort } from './dto/photo-list-query.dto';
 import { PhotoResponse } from './dto/photo-response.dto';
@@ -522,6 +525,210 @@ export class PhotoService {
           score,
         },
       });
+    });
+  }
+
+  async createComment(id: number, user: User, request: PhotoCommentCreateRequest) {
+    const photo = await this.prisma.photo.findUnique({
+      where: {
+        id,
+      },
+    });
+
+    if (!photo) {
+      throw new NotFoundException('photo is not found');
+    }
+
+    if (request.parentId) {
+      const parent = await this.prisma.photoComment.findUnique({
+        where: {
+          id: request.parentId,
+        },
+      });
+
+      if (!parent) {
+        throw new NotFoundException('parent comment is not found');
+      }
+
+      if (parent.photoId !== id) {
+        throw new NotFoundException('parent comment does not belong to this photo');
+      }
+    }
+
+    const comment = await this.prisma.photoComment.create({
+      data: {
+        photoId: id,
+        userId: user.id,
+        content: request.content,
+        parentId: request.parentId,
+        mentionId: request.mentionId,
+      },
+      include: {
+        user: {
+          include: {
+            _count: {
+              select: {
+                followers: true,
+                followings: true,
+              },
+            },
+            followers: {
+              where: {
+                followerId: user.id,
+              },
+            },
+          },
+        },
+        mention: {
+          include: {
+            _count: {
+              select: {
+                followers: true,
+                followings: true,
+              },
+            },
+            followers: {
+              where: {
+                followerId: user.id,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    return new PhotoCommentResponse({
+      comment,
+      user,
+    });
+  }
+
+  async updateComment(id: number, commentId: number, user: User, request: PhotoCommentUpdateRequest) {
+    const comment = await this.prisma.photoComment.findUnique({
+      where: {
+        id: commentId,
+      },
+    });
+
+    if (!comment) {
+      throw new NotFoundException('comment is not found');
+    }
+
+    if (comment.photoId !== id) {
+      throw new NotFoundException('comment does not belong to this photo');
+    }
+
+    if (comment.userId !== user.id) {
+      throw new UnauthorizedException('you are not the owner of this comment');
+    }
+
+    const updatedComment = await this.prisma.photoComment.update({
+      where: {
+        id: commentId,
+      },
+      data: {
+        content: request.content,
+      },
+      include: {
+        user: {
+          include: {
+            _count: {
+              select: {
+                followers: true,
+                followings: true,
+              },
+            },
+            followers: {
+              where: {
+                followerId: user.id,
+              },
+            },
+          },
+        },
+        mention: {
+          include: {
+            _count: {
+              select: {
+                followers: true,
+                followings: true,
+              },
+            },
+            followers: {
+              where: {
+                followerId: user.id,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    return new PhotoCommentResponse({
+      comment: updatedComment,
+      user,
+    });
+  }
+
+  async deleteComment(id: number, commentId: number, user: User) {
+    const comment = await this.prisma.photoComment.findUnique({
+      where: {
+        id: commentId,
+      },
+    });
+
+    if (!comment) {
+      throw new NotFoundException('comment is not found');
+    }
+
+    if (comment.photoId !== id) {
+      throw new NotFoundException('comment does not belong to this photo');
+    }
+
+    if (comment.userId !== user.id) {
+      throw new UnauthorizedException('you are not the owner of this comment');
+    }
+
+    const deletedComment = await this.prisma.photoComment.delete({
+      where: {
+        id: commentId,
+      },
+      include: {
+        user: {
+          include: {
+            _count: {
+              select: {
+                followers: true,
+                followings: true,
+              },
+            },
+            followers: {
+              where: {
+                followerId: user.id,
+              },
+            },
+          },
+        },
+        mention: {
+          include: {
+            _count: {
+              select: {
+                followers: true,
+                followings: true,
+              },
+            },
+            followers: {
+              where: {
+                followerId: user.id,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    return new PhotoCommentResponse({
+      comment: deletedComment,
+      user,
     });
   }
 

@@ -20,6 +20,9 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBody, ApiConsumes, ApiCreatedResponse, ApiOkResponse } from '@nestjs/swagger';
 import { User } from '@prisma/client';
+import { PhotoCommentCreateRequest } from './dto/photo-comment-create-request.dto';
+import { PhotoCommentResponse } from './dto/photo-comment-response.dto';
+import { PhotoCommentUpdateRequest } from './dto/photo-comment-update-request.dto';
 import { PhotoCreateRequest } from './dto/photo-create-request.dto';
 import { PhotoListQuery } from './dto/photo-list-query.dto';
 import { PhotoResponse } from './dto/photo-response.dto';
@@ -79,6 +82,35 @@ export class PhotoController {
   @Delete(':id/likes')
   async unlike(@Param('id') id: number, @GetUser() user: User) {
     return this.photoService.unlike(id, user);
+  }
+
+  @ApiCreatedResponse({
+    type: PhotoCommentResponse,
+  })
+  @Post(':id/comments')
+  async createComment(@Param('id') id: number, @GetUser() user: User, @Body() request: PhotoCommentCreateRequest) {
+    return this.photoService.createComment(id, user, request);
+  }
+
+  @ApiOkResponse({
+    type: PhotoCommentResponse,
+  })
+  @Put(':id/comments/:commentId')
+  async updateComment(
+    @Param('id') photoId: number,
+    @Param('commentId') commentId: number,
+    @GetUser() user: User,
+    @Body() request: PhotoCommentUpdateRequest,
+  ) {
+    return this.photoService.updateComment(photoId, commentId, user, request);
+  }
+
+  @ApiOkResponse({
+    type: PhotoCommentResponse,
+  })
+  @Delete(':id/comments/:commentId')
+  async deleteComment(@Param('id') photoId: number, @Param('commentId') commentId: number, @GetUser() user: User) {
+    return this.photoService.deleteComment(photoId, commentId, user);
   }
 
   @ApiCreatedResponse({
