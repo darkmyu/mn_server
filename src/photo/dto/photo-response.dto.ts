@@ -3,42 +3,15 @@ import { FileResponse } from '@/file/dto/file-response.dto';
 import { ProfileResponse } from '@/profile/dto/profile-response.dto';
 import { TagResponse } from '@/tag/dto/tag-response.dto';
 import { ApiProperty } from '@nestjs/swagger';
-import { Prisma } from '@prisma/client';
+import { Photo, PhotoImage } from '@prisma/client';
 
 export interface PhotoResponseParams {
-  photo: Prisma.PhotoGetPayload<{
-    include: {
-      user: {
-        include: {
-          _count: {
-            select: {
-              followers: true;
-              followings: true;
-            };
-          };
-          followers: true;
-        };
-      };
-      photoImage: true;
-      photoAnimals: {
-        include: {
-          animal: {
-            include: {
-              user: true;
-              breed: true;
-            };
-          };
-        };
-      };
-      photoTags: {
-        include: {
-          tag: true;
-        };
-      };
-      photoLikes: true;
-    };
-  }>;
-  isOwner: boolean;
+  photo: Photo;
+  image: PhotoImage;
+  isLike: boolean;
+  tags: TagResponse[];
+  animals: AnimalResponse[];
+  author: ProfileResponse;
 }
 
 export class PhotoResponse {
@@ -64,7 +37,7 @@ export class PhotoResponse {
   likes: number;
 
   @ApiProperty()
-  liked: boolean;
+  isLike: boolean;
 
   @ApiProperty({
     isArray: true,
@@ -81,24 +54,15 @@ export class PhotoResponse {
   @ApiProperty()
   author: ProfileResponse;
 
-  constructor({ photo, isOwner }: PhotoResponseParams) {
+  constructor({ photo, image, tags, isLike, animals, author }: PhotoResponseParams) {
     this.id = photo.id;
     this.title = photo.title;
     this.description = photo.description;
     this.likes = photo.likes;
-    this.liked = photo.photoLikes.length > 0;
-    this.tags = photo.photoTags.map(({ tag }) => new TagResponse({ tag }));
-    this.animals = photo.photoAnimals.map(({ animal }) => new AnimalResponse({ animal }));
-    this.author = new ProfileResponse({ user: photo.user, isOwner });
-
-    if (photo.photoImage) {
-      this.image = new FileResponse(
-        photo.photoImage.path,
-        photo.photoImage.size,
-        photo.photoImage.width,
-        photo.photoImage.height,
-        photo.photoImage.mimetype,
-      );
-    }
+    this.isLike = isLike;
+    this.tags = tags;
+    this.animals = animals;
+    this.author = author;
+    this.image = new FileResponse(image.path, image.size, image.width, image.height, image.mimetype);
   }
 }

@@ -1,15 +1,12 @@
 import { BreedResponse } from '@/breed/dto/breed-response.dto';
 import { UserResponse } from '@/user/dto/user-response.dto';
 import { ApiProperty } from '@nestjs/swagger';
-import { Gender, Prisma } from '@prisma/client';
+import { Animal, Breed, Gender, User } from '@prisma/client';
 
 export interface AnimalResponseParams {
-  animal: Prisma.AnimalGetPayload<{
-    include: {
-      user: true;
-      breed: true;
-    };
-  }>;
+  animal: Animal;
+  user: User;
+  breed: Breed;
 }
 
 export class AnimalResponse {
@@ -41,13 +38,13 @@ export class AnimalResponse {
   @ApiProperty()
   breed: BreedResponse;
 
-  constructor({ animal }: AnimalResponseParams) {
+  constructor({ animal, user, breed }: AnimalResponseParams) {
     this.id = animal.id;
     this.name = animal.name;
     this.gender = animal.gender;
     this.birthday = animal.birthday;
     this.thumbnail = animal.thumbnail;
-    this.owner = new UserResponse({ user: animal.user });
-    this.breed = new BreedResponse({ breed: animal.breed });
+    this.owner = new UserResponse({ user });
+    this.breed = new BreedResponse({ breed });
   }
 }

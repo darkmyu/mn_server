@@ -5,6 +5,7 @@ import { PaginationQuery } from '@/common/dto/pagination-query.dto';
 import { Pagination } from '@/common/dto/pagination.dto';
 import { PhotoResponse } from '@/photo/dto/photo-response.dto';
 import { PrismaService } from '@/prisma/prisma.service';
+import { TagResponse } from '@/tag/dto/tag-response.dto';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Prisma, User } from '@prisma/client';
 import { ProfileFollowResponse } from './dto/profile-follow-response.dto';
@@ -40,6 +41,9 @@ export class ProfileService {
 
     return new ProfileResponse({
       user: target,
+      isFollowing: target.followers.length > 0,
+      followers: target._count.followers,
+      followings: target._count.followings,
       isOwner: target.id === user?.id,
     });
   }
@@ -79,7 +83,15 @@ export class ProfileService {
       }),
     ]);
 
-    const items = animals.map((animal) => new AnimalResponse({ animal }));
+    const items = animals.map(
+      (animal) =>
+        new AnimalResponse({
+          animal,
+          user: animal.user,
+          breed: animal.breed,
+        }),
+    );
+
     const hasNextPage = page * limit < total;
 
     return new Pagination(items, page, total, limit, hasNextPage);
@@ -164,7 +176,24 @@ export class ProfileService {
       (photo) =>
         new PhotoResponse({
           photo,
-          isOwner: photo.user.id === user?.id,
+          image: photo.photoImage!,
+          tags: photo.photoTags.map(({ tag }) => new TagResponse({ tag })),
+          isLike: photo.photoLikes.length > 0,
+          animals: photo.photoAnimals.map(
+            ({ animal }) =>
+              new AnimalResponse({
+                animal,
+                user: animal.user,
+                breed: animal.breed,
+              }),
+          ),
+          author: new ProfileResponse({
+            user: photo.user,
+            isFollowing: photo.user.followers.length > 0,
+            followers: photo.user._count.followers,
+            followings: photo.user._count.followings,
+            isOwner: photo.userId === user?.id,
+          }),
         }),
     );
 
@@ -234,7 +263,24 @@ export class ProfileService {
 
     return new PhotoResponse({
       photo,
-      isOwner: photo.user.id === user?.id,
+      image: photo.photoImage!,
+      tags: photo.photoTags.map(({ tag }) => new TagResponse({ tag })),
+      isLike: photo.photoLikes.length > 0,
+      animals: photo.photoAnimals.map(
+        ({ animal }) =>
+          new AnimalResponse({
+            animal,
+            user: animal.user,
+            breed: animal.breed,
+          }),
+      ),
+      author: new ProfileResponse({
+        user: photo.user,
+        isFollowing: photo.user.followers.length > 0,
+        followers: photo.user._count.followers,
+        followings: photo.user._count.followings,
+        isOwner: photo.userId === user?.id,
+      }),
     });
   }
 

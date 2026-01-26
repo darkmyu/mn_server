@@ -42,7 +42,15 @@ export class AnimalService {
       }),
     ]);
 
-    const items = animals.map((animal) => new AnimalResponse({ animal }));
+    const items = animals.map(
+      (animal) =>
+        new AnimalResponse({
+          animal,
+          user: animal.user,
+          breed: animal.breed,
+        }),
+    );
+
     const hasNextPage = page * limit < total;
 
     return new Pagination(items, page, total, limit, hasNextPage);
@@ -67,7 +75,11 @@ export class AnimalService {
       throw new UnauthorizedException('you are not the owner of this animal');
     }
 
-    return new AnimalResponse({ animal });
+    return new AnimalResponse({
+      animal,
+      user: animal.user,
+      breed: animal.breed,
+    });
   }
 
   async create(user: User, request: AnimalCreateRequest) {
@@ -86,7 +98,11 @@ export class AnimalService {
       },
     });
 
-    return new AnimalResponse({ animal });
+    return new AnimalResponse({
+      animal,
+      user: animal.user,
+      breed: animal.breed,
+    });
   }
 
   async update(id: number, user: User, request: AnimalUpdateRequest) {
@@ -121,7 +137,11 @@ export class AnimalService {
       },
     });
 
-    return new AnimalResponse({ animal: updatedAnimal });
+    return new AnimalResponse({
+      animal: updatedAnimal,
+      user: updatedAnimal.user,
+      breed: updatedAnimal.breed,
+    });
   }
 
   async delete(id: number, user: User) {
@@ -149,7 +169,11 @@ export class AnimalService {
       },
     });
 
-    return new AnimalResponse({ animal: deletedAnimal });
+    return new AnimalResponse({
+      animal: deletedAnimal,
+      user: deletedAnimal.user,
+      breed: deletedAnimal.breed,
+    });
   }
 
   async upload(thumbnail: Express.Multer.File) {

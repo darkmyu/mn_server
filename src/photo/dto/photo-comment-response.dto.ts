@@ -1,35 +1,11 @@
 import { ProfileResponse } from '@/profile/dto/profile-response.dto';
 import { ApiProperty } from '@nestjs/swagger';
-import { Prisma, User } from '@prisma/client';
+import { PhotoComment } from '@prisma/client';
 
 export interface PhotoCommentResponseParams {
-  comment: Prisma.PhotoCommentGetPayload<{
-    include: {
-      user: {
-        include: {
-          followers: true;
-          _count: {
-            select: {
-              followers: true;
-              followings: true;
-            };
-          };
-        };
-      };
-      mention: {
-        include: {
-          followers: true;
-          _count: {
-            select: {
-              followers: true;
-              followings: true;
-            };
-          };
-        };
-      };
-    };
-  }>;
-  user: User | null;
+  comment: PhotoComment;
+  author: ProfileResponse;
+  mention: ProfileResponse | null;
 }
 
 export class PhotoCommentResponse {
@@ -45,6 +21,9 @@ export class PhotoCommentResponse {
   @ApiProperty()
   updatedAt: Date;
 
+  @ApiProperty()
+  author: ProfileResponse;
+
   @ApiProperty({
     type: 'number',
     nullable: true,
@@ -57,18 +36,13 @@ export class PhotoCommentResponse {
   })
   mention: ProfileResponse | null;
 
-  @ApiProperty()
-  author: ProfileResponse;
-
-  constructor({ comment, user }: PhotoCommentResponseParams) {
+  constructor({ comment, mention, author }: PhotoCommentResponseParams) {
     this.id = comment.id;
     this.content = comment.content;
     this.createdAt = comment.createdAt;
     this.updatedAt = comment.updatedAt;
     this.parentId = comment.parentId;
-    this.mention = comment.mention
-      ? new ProfileResponse({ user: comment.mention, isOwner: comment.mentionId === user?.id })
-      : null;
-    this.author = new ProfileResponse({ user: comment.user, isOwner: comment.userId === user?.id });
+    this.mention = mention;
+    this.author = author;
   }
 }

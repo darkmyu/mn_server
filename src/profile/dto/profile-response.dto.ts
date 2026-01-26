@@ -1,57 +1,33 @@
+import { UserResponse } from '@/user/dto/user-response.dto';
 import { ApiProperty } from '@nestjs/swagger';
-import { Prisma } from '@prisma/client';
+import { User } from '@prisma/client';
 
 export interface ProfileResponseParams {
-  user: Prisma.UserGetPayload<{
-    include: {
-      followers: true;
-      _count: {
-        select: {
-          followers: true;
-          followings: true;
-        };
-      };
-    };
-  }>;
+  user: User;
+  isFollowing: boolean;
+  followers: number;
+  followings: number;
   isOwner: boolean;
 }
 
-export class ProfileResponse {
+export class ProfileResponse extends UserResponse {
   @ApiProperty()
-  id: number;
-
-  @ApiProperty()
-  username: string;
+  isFollowing: boolean;
 
   @ApiProperty()
-  nickname: string;
-
-  @ApiProperty({
-    type: 'string',
-    nullable: true,
-  })
-  profileImage: string | null;
+  followers: number;
 
   @ApiProperty()
-  followers: number = 0;
+  followings: number;
 
   @ApiProperty()
-  followings: number = 0;
+  isOwner: boolean;
 
-  @ApiProperty()
-  isFollowing: boolean = false;
-
-  @ApiProperty()
-  isOwner: boolean = false;
-
-  constructor({ user, isOwner }: ProfileResponseParams) {
-    this.id = user.id;
-    this.username = user.username;
-    this.nickname = user.nickname;
-    this.profileImage = user.profileImage;
-    this.followers = user._count.followers;
-    this.followings = user._count.followings;
-    this.isFollowing = user.followers.length > 0;
+  constructor({ user, isFollowing, followers, followings, isOwner }: ProfileResponseParams) {
+    super({ user });
+    this.isFollowing = isFollowing;
+    this.followers = followers;
+    this.followings = followings;
     this.isOwner = isOwner;
   }
 }

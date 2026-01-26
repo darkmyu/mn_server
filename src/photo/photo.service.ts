@@ -1,8 +1,11 @@
 import { AlgorithmService } from '@/algorithm/algorithm.service';
+import { AnimalResponse } from '@/animal/dto/animal-response.dto';
 import { CursorPagination } from '@/common/dto/cursor-pagination.dto';
 import { ConverterService } from '@/converter/converter.service';
 import { FileService } from '@/file/file.service';
 import { PrismaService } from '@/prisma/prisma.service';
+import { ProfileResponse } from '@/profile/dto/profile-response.dto';
+import { TagResponse } from '@/tag/dto/tag-response.dto';
 import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { Prisma, User } from '@prisma/client';
 import { PhotoCommentCreateRequest } from './dto/photo-comment-create-request.dto';
@@ -82,7 +85,24 @@ export class PhotoService {
       (photo) =>
         new PhotoResponse({
           photo,
-          isOwner: photo.user.id === user?.id,
+          image: photo.photoImage!,
+          tags: photo.photoTags.map(({ tag }) => new TagResponse({ tag })),
+          isLike: photo.photoLikes.length > 0,
+          animals: photo.photoAnimals.map(
+            ({ animal }) =>
+              new AnimalResponse({
+                animal,
+                user: animal.user,
+                breed: animal.breed,
+              }),
+          ),
+          author: new ProfileResponse({
+            user: photo.user,
+            isFollowing: photo.user.followers.length > 0,
+            followers: photo.user._count.followers,
+            followings: photo.user._count.followings,
+            isOwner: photo.userId === user?.id,
+          }),
         }),
     );
 
@@ -146,7 +166,24 @@ export class PhotoService {
 
     return new PhotoResponse({
       photo,
-      isOwner: photo.user.id === user.id,
+      image: photo.photoImage!,
+      tags: photo.photoTags.map(({ tag }) => new TagResponse({ tag })),
+      isLike: photo.photoLikes.length > 0,
+      animals: photo.photoAnimals.map(
+        ({ animal }) =>
+          new AnimalResponse({
+            animal,
+            user: animal.user,
+            breed: animal.breed,
+          }),
+      ),
+      author: new ProfileResponse({
+        user: photo.user,
+        isFollowing: photo.user.followers.length > 0,
+        followers: photo.user._count.followers,
+        followings: photo.user._count.followings,
+        isOwner: photo.userId === user?.id,
+      }),
     });
   }
 
@@ -246,7 +283,24 @@ export class PhotoService {
 
     return new PhotoResponse({
       photo,
-      isOwner: photo.user.id === user.id,
+      image: photo.photoImage!,
+      tags: photo.photoTags.map(({ tag }) => new TagResponse({ tag })),
+      isLike: photo.photoLikes.length > 0,
+      animals: photo.photoAnimals.map(
+        ({ animal }) =>
+          new AnimalResponse({
+            animal,
+            user: animal.user,
+            breed: animal.breed,
+          }),
+      ),
+      author: new ProfileResponse({
+        user: photo.user,
+        isFollowing: photo.user.followers.length > 0,
+        followers: photo.user._count.followers,
+        followings: photo.user._count.followings,
+        isOwner: photo.userId === user?.id,
+      }),
     });
   }
 
@@ -364,8 +418,25 @@ export class PhotoService {
     });
 
     return new PhotoResponse({
-      photo: updatedPhoto,
-      isOwner: updatedPhoto.user.id === user.id,
+      photo,
+      image: updatedPhoto.photoImage!,
+      tags: updatedPhoto.photoTags.map(({ tag }) => new TagResponse({ tag })),
+      isLike: updatedPhoto.photoLikes.length > 0,
+      animals: updatedPhoto.photoAnimals.map(
+        ({ animal }) =>
+          new AnimalResponse({
+            animal,
+            user: animal.user,
+            breed: animal.breed,
+          }),
+      ),
+      author: new ProfileResponse({
+        user: updatedPhoto.user,
+        isFollowing: updatedPhoto.user.followers.length > 0,
+        followers: updatedPhoto.user._count.followers,
+        followings: updatedPhoto.user._count.followings,
+        isOwner: updatedPhoto.userId === user?.id,
+      }),
     });
   }
 
@@ -429,8 +500,25 @@ export class PhotoService {
     });
 
     return new PhotoResponse({
-      photo: deletedPhoto,
-      isOwner: deletedPhoto.user.id === user.id,
+      photo,
+      image: deletedPhoto.photoImage!,
+      tags: deletedPhoto.photoTags.map(({ tag }) => new TagResponse({ tag })),
+      isLike: deletedPhoto.photoLikes.length > 0,
+      animals: deletedPhoto.photoAnimals.map(
+        ({ animal }) =>
+          new AnimalResponse({
+            animal,
+            user: animal.user,
+            breed: animal.breed,
+          }),
+      ),
+      author: new ProfileResponse({
+        user: deletedPhoto.user,
+        isFollowing: deletedPhoto.user.followers.length > 0,
+        followers: deletedPhoto.user._count.followers,
+        followings: deletedPhoto.user._count.followings,
+        isOwner: deletedPhoto.userId === user?.id,
+      }),
     });
   }
 
@@ -599,7 +687,22 @@ export class PhotoService {
 
     return new PhotoCommentResponse({
       comment,
-      user,
+      author: new ProfileResponse({
+        user: comment.user,
+        isFollowing: comment.user.followers.length > 0,
+        followers: comment.user._count.followers,
+        followings: comment.user._count.followings,
+        isOwner: comment.userId === user.id,
+      }),
+      mention: comment.mention
+        ? new ProfileResponse({
+            user: comment.mention,
+            isFollowing: comment.mention.followers.length > 0,
+            followers: comment.mention._count.followers,
+            followings: comment.mention._count.followings,
+            isOwner: comment.mentionId === user.id,
+          })
+        : null,
     });
   }
 
@@ -664,8 +767,23 @@ export class PhotoService {
     });
 
     return new PhotoCommentResponse({
-      comment: updatedComment,
-      user,
+      comment,
+      author: new ProfileResponse({
+        user: updatedComment.user,
+        isFollowing: updatedComment.user.followers.length > 0,
+        followers: updatedComment.user._count.followers,
+        followings: updatedComment.user._count.followings,
+        isOwner: updatedComment.userId === user.id,
+      }),
+      mention: updatedComment.mention
+        ? new ProfileResponse({
+            user: updatedComment.mention,
+            isFollowing: updatedComment.mention.followers.length > 0,
+            followers: updatedComment.mention._count.followers,
+            followings: updatedComment.mention._count.followings,
+            isOwner: updatedComment.mentionId === user.id,
+          })
+        : null,
     });
   }
 
@@ -727,8 +845,23 @@ export class PhotoService {
     });
 
     return new PhotoCommentResponse({
-      comment: deletedComment,
-      user,
+      comment,
+      author: new ProfileResponse({
+        user: deletedComment.user,
+        isFollowing: deletedComment.user.followers.length > 0,
+        followers: deletedComment.user._count.followers,
+        followings: deletedComment.user._count.followings,
+        isOwner: deletedComment.userId === user.id,
+      }),
+      mention: deletedComment.mention
+        ? new ProfileResponse({
+            user: deletedComment.mention,
+            isFollowing: deletedComment.mention.followers.length > 0,
+            followers: deletedComment.mention._count.followers,
+            followings: deletedComment.mention._count.followings,
+            isOwner: deletedComment.mentionId === user.id,
+          })
+        : null,
     });
   }
 
