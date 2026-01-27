@@ -1,5 +1,7 @@
 import { AlgorithmService } from '@/algorithm/algorithm.service';
 import { CursorPagination } from '@/common/dto/cursor-pagination.dto';
+import { PaginationQuery } from '@/common/dto/pagination-query.dto';
+import { Pagination } from '@/common/dto/pagination.dto';
 import { ConverterService } from '@/converter/converter.service';
 import { FileService } from '@/file/file.service';
 import { PrismaService } from '@/prisma/prisma.service';
@@ -507,6 +509,159 @@ export class PhotoService {
         },
       });
     });
+  }
+
+  async getComments(id: number, query: PaginationQuery, viewer: User | null) {
+    const photo = await this.prisma.photo.findUnique({
+      where: {
+        id,
+      },
+    });
+
+    if (!photo) {
+      throw new NotFoundException('photo is not found');
+    }
+
+    const { page, limit } = query;
+
+    const [total, comments] = await this.prisma.$transaction([
+      this.prisma.photoComment.count({
+        where: {
+          photoId: id,
+        },
+      }),
+      this.prisma.photoComment.findMany({
+        where: {
+          photoId: id,
+          parentId: null,
+        },
+        include: {
+          user: {
+            include: {
+              _count: {
+                select: {
+                  followers: true,
+                  followings: true,
+                },
+              },
+              followers: {
+                where: {
+                  followerId: viewer ? viewer.id : -1,
+                },
+              },
+            },
+          },
+          mention: {
+            include: {
+              _count: {
+                select: {
+                  followers: true,
+                  followings: true,
+                },
+              },
+              followers: {
+                where: {
+                  followerId: viewer ? viewer.id : -1,
+                },
+              },
+            },
+          },
+        },
+        take: limit,
+        skip: (page - 1) * limit,
+        orderBy: {
+          id: 'asc',
+        },
+      }),
+    ]);
+
+    const items = comments.map((comment) => new PhotoCommentResponse({ comment, viewer }));
+    const hasNextPage = page * limit < total;
+
+    return new Pagination(items, page, total, limit, hasNextPage);
+  }
+
+  async getReplies(id: number, commentId: number, query: PaginationQuery, viewer: User | null) {
+    const photo = await this.prisma.photo.findUnique({
+      where: {
+        id,
+      },
+    });
+
+    if (!photo) {
+      throw new NotFoundException('photo is not found');
+    }
+
+    const parent = await this.prisma.photoComment.findUnique({
+      where: {
+        id: commentId,
+      },
+    });
+
+    if (!parent) {
+      throw new NotFoundException('parent comment is not found');
+    }
+
+    if (parent.photoId !== id) {
+      throw new NotFoundException('parent comment does not belong to this photo');
+    }
+
+    const { page, limit } = query;
+
+    const [total, comments] = await this.prisma.$transaction([
+      this.prisma.photoComment.count({
+        where: {
+          parentId: commentId,
+        },
+      }),
+      this.prisma.photoComment.findMany({
+        where: {
+          parentId: commentId,
+        },
+        include: {
+          user: {
+            include: {
+              _count: {
+                select: {
+                  followers: true,
+                  followings: true,
+                },
+              },
+              followers: {
+                where: {
+                  followerId: viewer ? viewer.id : -1,
+                },
+              },
+            },
+          },
+          mention: {
+            include: {
+              _count: {
+                select: {
+                  followers: true,
+                  followings: true,
+                },
+              },
+              followers: {
+                where: {
+                  followerId: viewer ? viewer.id : -1,
+                },
+              },
+            },
+          },
+        },
+        take: limit,
+        skip: (page - 1) * limit,
+        orderBy: {
+          id: 'asc',
+        },
+      }),
+    ]);
+
+    const items = comments.map((comment) => new PhotoCommentResponse({ comment, viewer }));
+    const hasNextPage = page * limit < total;
+
+    return new Pagination(items, page, total, limit, hasNextPage);
   }
 
   async createComment(id: number, viewer: User, request: PhotoCommentCreateRequest) {

@@ -1,6 +1,8 @@
 import { GetUser } from '@/auth/decorator/get-user.decorator';
 import { IgnoreUnauthorized } from '@/auth/decorator/ignore-unauthorized.decorator';
 import { ApiOkResponseCursorPagination } from '@/common/decorator/api-ok-response-cursor-pagination.dto';
+import { ApiOkResponsePagination } from '@/common/decorator/api-ok-response-pagination.dto';
+import { PaginationQuery } from '@/common/dto/pagination-query.dto';
 import { FileResponse } from '@/file/dto/file-response.dto';
 import {
   Body,
@@ -82,6 +84,25 @@ export class PhotoController {
   @Delete(':id/likes')
   async unlike(@Param('id') id: number, @GetUser() viewer: User) {
     return this.photoService.unlike(id, viewer);
+  }
+
+  @ApiOkResponsePagination(PhotoCommentResponse)
+  @IgnoreUnauthorized()
+  @Get(':id/comments')
+  async getComments(@Param('id') id: number, @Query() query: PaginationQuery, @GetUser() viewer: User | null) {
+    return this.photoService.getComments(id, query, viewer);
+  }
+
+  @ApiOkResponsePagination(PhotoCommentResponse)
+  @IgnoreUnauthorized()
+  @Get(':id/comments/:commentId/replies')
+  async getReplies(
+    @Param('id') id: number,
+    @Param('commentId') commentId: number,
+    @Query() query: PaginationQuery,
+    @GetUser() viewier: User | null,
+  ) {
+    return this.photoService.getReplies(id, commentId, query, viewier);
   }
 
   @ApiCreatedResponse({
