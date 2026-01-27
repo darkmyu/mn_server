@@ -8,8 +8,9 @@ import { CursorPaginationQuery } from '@/common/dto/cursor-pagination-query.dto'
 import { PaginationQuery } from '@/common/dto/pagination-query.dto';
 import { PhotoResponse } from '@/photo/dto/photo-response.dto';
 import { Controller, Delete, Get, Param, Post, Query } from '@nestjs/common';
-import { ApiOkResponse } from '@nestjs/swagger';
+import { ApiCreatedResponse, ApiOkResponse } from '@nestjs/swagger';
 import { User } from '@prisma/client';
+import { ProfileFollowResponse } from './dto/profile-follow-response.dto';
 import { ProfileResponse } from './dto/profile-response.dto';
 import { ProfileService } from './profile.service';
 
@@ -53,13 +54,17 @@ export class ProfileController {
     return this.profileService.photo(username, id, viewer);
   }
 
-  @ApiOkResponse()
+  @ApiCreatedResponse({
+    type: ProfileFollowResponse,
+  })
   @Post(':username/follows')
   async follow(@Param('username') username: string, @GetUser() viewer: User) {
     return this.profileService.follow(username, viewer);
   }
 
-  @ApiOkResponse()
+  @ApiOkResponse({
+    type: ProfileFollowResponse,
+  })
   @Delete(':username/follows')
   async unfollow(@Param('username') username: string, @GetUser() viewer: User) {
     return this.profileService.unfollow(username, viewer);
