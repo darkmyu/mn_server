@@ -1,6 +1,6 @@
 import { ProfileResponse } from '@/profile/dto/profile-response.dto';
 import { ApiProperty } from '@nestjs/swagger';
-import { Prisma } from '@prisma/client';
+import { Prisma, User } from '@prisma/client';
 
 export interface PhotoCommentResponseParams {
   comment: Prisma.PhotoCommentGetPayload<{
@@ -29,6 +29,7 @@ export interface PhotoCommentResponseParams {
       };
     };
   }>;
+  viewer: User | null;
 }
 
 export class PhotoCommentResponse {
@@ -59,13 +60,13 @@ export class PhotoCommentResponse {
   })
   mention: ProfileResponse | null;
 
-  constructor({ comment }: PhotoCommentResponseParams) {
+  constructor({ comment, viewer }: PhotoCommentResponseParams) {
     this.id = comment.id;
     this.content = comment.content;
     this.createdAt = comment.createdAt;
     this.updatedAt = comment.updatedAt;
-    this.author = new ProfileResponse({ user: comment.user });
+    this.author = new ProfileResponse({ user: comment.user, viewer });
     this.parentId = comment.parentId;
-    this.mention = comment.mention ? new ProfileResponse({ user: comment.mention }) : null;
+    this.mention = comment.mention ? new ProfileResponse({ user: comment.mention, viewer }) : null;
   }
 }

@@ -22,8 +22,8 @@ export class ProfileController {
   })
   @IgnoreUnauthorized()
   @Get(':username')
-  async read(@Param('username') username: string, @GetUser() user: User | null) {
-    return this.profileService.read(username, user);
+  async read(@Param('username') username: string, @GetUser() viewer: User | null) {
+    return this.profileService.read(username, viewer);
   }
 
   @ApiOkResponsePagination(AnimalResponse)
@@ -39,9 +39,9 @@ export class ProfileController {
   async photos(
     @Param('username') username: string,
     @Query() query: CursorPaginationQuery,
-    @GetUser() user: User | null,
+    @GetUser() viewer: User | null,
   ) {
-    return this.profileService.photos(username, query, user);
+    return this.profileService.photos(username, query, viewer);
   }
 
   @ApiOkResponse({
@@ -49,19 +49,19 @@ export class ProfileController {
   })
   @IgnoreUnauthorized()
   @Get(':username/photos/:id')
-  async photo(@Param('username') username: string, @Param('id') id: number, @GetUser() user: User | null) {
-    return this.profileService.photo(username, id, user);
+  async photo(@Param('username') username: string, @Param('id') id: number, @GetUser() viewer: User | null) {
+    return this.profileService.photo(username, id, viewer);
   }
 
   @ApiOkResponse()
   @Post(':username/follows')
-  async follow(@Param('username') username: string, @GetUser() user: User) {
-    return this.profileService.follow(username, user);
+  async follow(@Param('username') username: string, @GetUser() viewer: User) {
+    return this.profileService.follow(username, viewer);
   }
 
   @ApiOkResponse()
   @Delete(':username/follows')
-  async unfollow(@Param('username') username: string, @GetUser() user: User) {
-    return this.profileService.unfollow(username, user);
+  async unfollow(@Param('username') username: string, @GetUser() viewer: User) {
+    return this.profileService.unfollow(username, viewer);
   }
 }

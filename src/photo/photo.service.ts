@@ -22,7 +22,7 @@ export class PhotoService {
     private readonly algorithmService: AlgorithmService,
   ) {}
 
-  async all(query: PhotoListQuery, user: User | null) {
+  async all(query: PhotoListQuery, viewer: User | null) {
     const { cursor, limit, sort } = query;
 
     const [total, photos] = await this.prisma.$transaction([
@@ -39,7 +39,7 @@ export class PhotoService {
               },
               followers: {
                 where: {
-                  followerId: user ? user.id : -1,
+                  followerId: viewer ? viewer.id : -1,
                 },
               },
             },
@@ -62,7 +62,7 @@ export class PhotoService {
           },
           photoLikes: {
             where: {
-              userId: user ? user.id : -1,
+              userId: viewer ? viewer.id : -1,
             },
           },
         },
@@ -78,13 +78,13 @@ export class PhotoService {
       photos.pop();
     }
 
-    const items = photos.map((photo) => new PhotoResponse({ photo }));
+    const items = photos.map((photo) => new PhotoResponse({ photo, viewer }));
     const nextCursor = hasNextPage ? photos[photos.length - 1].id : null;
 
     return new CursorPagination(items, nextCursor, total, limit, hasNextPage);
   }
 
-  async read(id: number, user: User) {
+  async read(id: number, viewer: User) {
     const photo = await this.prisma.photo.findUnique({
       where: {
         id,
@@ -100,7 +100,7 @@ export class PhotoService {
             },
             followers: {
               where: {
-                followerId: user ? user.id : -1,
+                followerId: viewer.id,
               },
             },
           },
@@ -123,7 +123,7 @@ export class PhotoService {
         },
         photoLikes: {
           where: {
-            userId: user.id,
+            userId: viewer.id,
           },
         },
       },
@@ -133,14 +133,14 @@ export class PhotoService {
       throw new NotFoundException('photo is not found');
     }
 
-    if (photo.userId !== user.id) {
+    if (photo.userId !== viewer.id) {
       throw new UnauthorizedException('you are not the owner of this photo');
     }
 
-    return new PhotoResponse({ photo });
+    return new PhotoResponse({ photo, viewer });
   }
 
-  async create(user: User, request: PhotoCreateRequest) {
+  async create(viewer: User, request: PhotoCreateRequest) {
     const animals = await this.prisma.animal.findMany({
       where: {
         id: {
@@ -153,14 +153,14 @@ export class PhotoService {
       throw new NotFoundException('one or more animals are not found');
     }
 
-    const isOwnedAnimals = animals.every((animal) => animal.userId === user.id);
+    const isOwnedAnimals = animals.every((animal) => animal.userId === viewer.id);
     if (!isOwnedAnimals) {
       throw new UnauthorizedException('you are not the owner of some animals');
     }
 
     const photo = await this.prisma.photo.create({
       data: {
-        userId: user.id,
+        userId: viewer.id,
         photoAnimals: {
           create: request.animalIds.map((animalId) => ({
             animalId,
@@ -205,7 +205,7 @@ export class PhotoService {
             },
             followers: {
               where: {
-                followerId: user ? user.id : -1,
+                followerId: viewer.id,
               },
             },
           },
@@ -228,16 +228,16 @@ export class PhotoService {
         },
         photoLikes: {
           where: {
-            userId: user.id,
+            userId: viewer.id,
           },
         },
       },
     });
 
-    return new PhotoResponse({ photo });
+    return new PhotoResponse({ photo, viewer });
   }
 
-  async update(id: number, user: User, request: PhotoUpdateRequest) {
+  async update(id: number, viewer: User, request: PhotoUpdateRequest) {
     const photo = await this.prisma.photo.findUnique({
       where: {
         id,
@@ -248,7 +248,7 @@ export class PhotoService {
       throw new NotFoundException('photo is not found');
     }
 
-    if (photo.userId !== user.id) {
+    if (photo.userId !== viewer.id) {
       throw new UnauthorizedException('you are not the owner of this photo');
     }
 
@@ -264,7 +264,7 @@ export class PhotoService {
       throw new NotFoundException('one or more animals are not found');
     }
 
-    const isOwnedAnimals = animals.every((animal) => animal.userId === user.id);
+    const isOwnedAnimals = animals.every((animal) => animal.userId === viewer.id);
     if (!isOwnedAnimals) {
       throw new UnauthorizedException('you are not the owner of some animals');
     }
@@ -274,7 +274,7 @@ export class PhotoService {
         id,
       },
       data: {
-        userId: user.id,
+        userId: viewer.id,
         photoAnimals: {
           deleteMany: {},
           create: request.animalIds.map((animalId) => ({
@@ -321,7 +321,7 @@ export class PhotoService {
             },
             followers: {
               where: {
-                followerId: user ? user.id : -1,
+                followerId: viewer.id,
               },
             },
           },
@@ -344,16 +344,16 @@ export class PhotoService {
         },
         photoLikes: {
           where: {
-            userId: user.id,
+            userId: viewer.id,
           },
         },
       },
     });
 
-    return new PhotoResponse({ photo: updatedPhoto });
+    return new PhotoResponse({ photo: updatedPhoto, viewer });
   }
 
-  async delete(id: number, user: User) {
+  async delete(id: number, viewer: User) {
     const photo = await this.prisma.photo.findUnique({
       where: {
         id,
@@ -364,7 +364,7 @@ export class PhotoService {
       throw new NotFoundException('photo is not found');
     }
 
-    if (photo.userId !== user.id) {
+    if (photo.userId !== viewer.id) {
       throw new UnauthorizedException('you are not the owner of this photo');
     }
 
@@ -383,7 +383,7 @@ export class PhotoService {
             },
             followers: {
               where: {
-                followerId: user.id,
+                followerId: viewer.id,
               },
             },
           },
@@ -406,16 +406,16 @@ export class PhotoService {
         },
         photoLikes: {
           where: {
-            userId: user.id,
+            userId: viewer.id,
           },
         },
       },
     });
 
-    return new PhotoResponse({ photo: deletedPhoto });
+    return new PhotoResponse({ photo: deletedPhoto, viewer });
   }
 
-  async like(id: number, user: User) {
+  async like(id: number, viewer: User) {
     const photo = await this.prisma.photo.findUnique({
       where: {
         id,
@@ -429,7 +429,7 @@ export class PhotoService {
     await this.prisma.$transaction(async (tx) => {
       await tx.photoLike.create({
         data: {
-          userId: user.id,
+          userId: viewer.id,
           photoId: photo.id,
         },
       });
@@ -461,7 +461,7 @@ export class PhotoService {
     });
   }
 
-  async unlike(id: number, user: User) {
+  async unlike(id: number, viewer: User) {
     const photo = await this.prisma.photo.findUnique({
       where: {
         id,
@@ -476,7 +476,7 @@ export class PhotoService {
       await tx.photoLike.delete({
         where: {
           userId_photoId: {
-            userId: user.id,
+            userId: viewer.id,
             photoId: id,
           },
         },
@@ -509,7 +509,7 @@ export class PhotoService {
     });
   }
 
-  async createComment(id: number, user: User, request: PhotoCommentCreateRequest) {
+  async createComment(id: number, viewer: User, request: PhotoCommentCreateRequest) {
     const photo = await this.prisma.photo.findUnique({
       where: {
         id,
@@ -539,7 +539,7 @@ export class PhotoService {
     const comment = await this.prisma.photoComment.create({
       data: {
         photoId: id,
-        userId: user.id,
+        userId: viewer.id,
         content: request.content,
         parentId: request.parentId,
         mentionId: request.mentionId,
@@ -555,7 +555,7 @@ export class PhotoService {
             },
             followers: {
               where: {
-                followerId: user.id,
+                followerId: viewer.id,
               },
             },
           },
@@ -570,7 +570,7 @@ export class PhotoService {
             },
             followers: {
               where: {
-                followerId: user.id,
+                followerId: viewer.id,
               },
             },
           },
@@ -578,10 +578,10 @@ export class PhotoService {
       },
     });
 
-    return new PhotoCommentResponse({ comment });
+    return new PhotoCommentResponse({ comment, viewer });
   }
 
-  async updateComment(id: number, commentId: number, user: User, request: PhotoCommentUpdateRequest) {
+  async updateComment(id: number, commentId: number, viewer: User, request: PhotoCommentUpdateRequest) {
     const comment = await this.prisma.photoComment.findUnique({
       where: {
         id: commentId,
@@ -596,7 +596,7 @@ export class PhotoService {
       throw new NotFoundException('comment does not belong to this photo');
     }
 
-    if (comment.userId !== user.id) {
+    if (comment.userId !== viewer.id) {
       throw new UnauthorizedException('you are not the owner of this comment');
     }
 
@@ -618,7 +618,7 @@ export class PhotoService {
             },
             followers: {
               where: {
-                followerId: user.id,
+                followerId: viewer.id,
               },
             },
           },
@@ -633,7 +633,7 @@ export class PhotoService {
             },
             followers: {
               where: {
-                followerId: user.id,
+                followerId: viewer.id,
               },
             },
           },
@@ -641,10 +641,10 @@ export class PhotoService {
       },
     });
 
-    return new PhotoCommentResponse({ comment: updatedComment });
+    return new PhotoCommentResponse({ comment: updatedComment, viewer });
   }
 
-  async deleteComment(id: number, commentId: number, user: User) {
+  async deleteComment(id: number, commentId: number, viewer: User) {
     const comment = await this.prisma.photoComment.findUnique({
       where: {
         id: commentId,
@@ -659,7 +659,7 @@ export class PhotoService {
       throw new NotFoundException('comment does not belong to this photo');
     }
 
-    if (comment.userId !== user.id) {
+    if (comment.userId !== viewer.id) {
       throw new UnauthorizedException('you are not the owner of this comment');
     }
 
@@ -678,7 +678,7 @@ export class PhotoService {
             },
             followers: {
               where: {
-                followerId: user.id,
+                followerId: viewer.id,
               },
             },
           },
@@ -693,7 +693,7 @@ export class PhotoService {
             },
             followers: {
               where: {
-                followerId: user.id,
+                followerId: viewer.id,
               },
             },
           },
@@ -701,7 +701,7 @@ export class PhotoService {
       },
     });
 
-    return new PhotoCommentResponse({ comment: deletedComment });
+    return new PhotoCommentResponse({ comment: deletedComment, viewer });
   }
 
   async upload(image: Express.Multer.File) {

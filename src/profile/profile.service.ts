@@ -38,7 +38,7 @@ export class ProfileService {
       throw new NotFoundException('user is not found');
     }
 
-    return new ProfileResponse({ user });
+    return new ProfileResponse({ user, viewer });
   }
 
   async animals(username: string, query: PaginationQuery) {
@@ -82,7 +82,7 @@ export class ProfileService {
     return new Pagination(items, page, total, limit, hasNextPage);
   }
 
-  async photos(username: string, query: CursorPaginationQuery, user: User | null) {
+  async photos(username: string, query: CursorPaginationQuery, viewer: User | null) {
     const { cursor, limit } = query;
 
     const author = await this.prisma.user.findUnique({
@@ -116,7 +116,7 @@ export class ProfileService {
               },
               followers: {
                 where: {
-                  followerId: user ? user.id : -1,
+                  followerId: viewer ? viewer.id : -1,
                 },
               },
             },
@@ -139,7 +139,7 @@ export class ProfileService {
           },
           photoLikes: {
             where: {
-              userId: user ? user.id : -1,
+              userId: viewer ? viewer.id : -1,
             },
           },
         },
@@ -157,13 +157,13 @@ export class ProfileService {
       photos.pop();
     }
 
-    const items = photos.map((photo) => new PhotoResponse({ photo }));
+    const items = photos.map((photo) => new PhotoResponse({ photo, viewer }));
     const nextCursor = hasNextPage ? photos[photos.length - 1].id : null;
 
     return new CursorPagination(items, nextCursor, total, limit, hasNextPage);
   }
 
-  async photo(username: string, id: number, user: User | null) {
+  async photo(username: string, id: number, viewer: User | null) {
     const author = await this.prisma.user.findUnique({
       where: {
         username,
@@ -189,7 +189,7 @@ export class ProfileService {
             },
             followers: {
               where: {
-                followerId: user ? user.id : -1,
+                followerId: viewer ? viewer.id : -1,
               },
             },
           },
@@ -212,7 +212,7 @@ export class ProfileService {
         },
         photoLikes: {
           where: {
-            userId: user ? user.id : -1,
+            userId: viewer ? viewer.id : -1,
           },
         },
       },
@@ -222,10 +222,10 @@ export class ProfileService {
       throw new NotFoundException('photo is not found');
     }
 
-    return new PhotoResponse({ photo });
+    return new PhotoResponse({ photo, viewer });
   }
 
-  async follow(username: string, user: User) {
+  async follow(username: string, viewer: User) {
     const target = await this.prisma.user.findUnique({
       where: {
         username,
@@ -238,7 +238,7 @@ export class ProfileService {
 
     await this.prisma.userFollow.create({
       data: {
-        followerId: user.id,
+        followerId: viewer.id,
         followingId: target.id,
       },
     });
@@ -246,7 +246,7 @@ export class ProfileService {
     return new ProfileFollowResponse(true);
   }
 
-  async unfollow(username: string, user: User) {
+  async unfollow(username: string, viewer: User) {
     const target = await this.prisma.user.findUnique({
       where: {
         username,
@@ -260,7 +260,7 @@ export class ProfileService {
     await this.prisma.userFollow.delete({
       where: {
         followerId_followingId: {
-          followerId: user.id,
+          followerId: viewer.id,
           followingId: target.id,
         },
       },

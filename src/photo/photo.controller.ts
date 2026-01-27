@@ -36,60 +36,60 @@ export class PhotoController {
   @ApiOkResponseCursorPagination(PhotoResponse)
   @IgnoreUnauthorized()
   @Get()
-  async all(@Query() query: PhotoListQuery, @GetUser() user: User | null) {
-    return this.photoService.all(query, user);
+  async all(@Query() query: PhotoListQuery, @GetUser() viewer: User | null) {
+    return this.photoService.all(query, viewer);
   }
 
   @ApiOkResponse({
     type: PhotoResponse,
   })
   @Get(':id')
-  async read(@Param('id') id: number, @GetUser() user: User) {
-    return this.photoService.read(id, user);
+  async read(@Param('id') id: number, @GetUser() viewer: User) {
+    return this.photoService.read(id, viewer);
   }
 
   @ApiCreatedResponse({
     type: PhotoResponse,
   })
   @Post()
-  async create(@GetUser() user: User, @Body() request: PhotoCreateRequest) {
-    return this.photoService.create(user, request);
+  async create(@GetUser() viewer: User, @Body() request: PhotoCreateRequest) {
+    return this.photoService.create(viewer, request);
   }
 
   @ApiOkResponse({
     type: PhotoResponse,
   })
   @Put(':id')
-  async update(@Param('id') id: number, @GetUser() user: User, @Body() request: PhotoUpdateRequest) {
-    return this.photoService.update(id, user, request);
+  async update(@Param('id') id: number, @GetUser() viewer: User, @Body() request: PhotoUpdateRequest) {
+    return this.photoService.update(id, viewer, request);
   }
 
   @ApiOkResponse({
     type: PhotoResponse,
   })
   @Delete(':id')
-  async delete(@Param('id') id: number, @GetUser() user: User) {
-    return this.photoService.delete(id, user);
+  async delete(@Param('id') id: number, @GetUser() viewer: User) {
+    return this.photoService.delete(id, viewer);
   }
 
   @ApiOkResponse()
   @Post(':id/likes')
-  async like(@Param('id') id: number, @GetUser() user: User) {
-    return this.photoService.like(id, user);
+  async like(@Param('id') id: number, @GetUser() viewer: User) {
+    return this.photoService.like(id, viewer);
   }
 
   @ApiOkResponse()
   @Delete(':id/likes')
-  async unlike(@Param('id') id: number, @GetUser() user: User) {
-    return this.photoService.unlike(id, user);
+  async unlike(@Param('id') id: number, @GetUser() viewer: User) {
+    return this.photoService.unlike(id, viewer);
   }
 
   @ApiCreatedResponse({
     type: PhotoCommentResponse,
   })
   @Post(':id/comments')
-  async createComment(@Param('id') id: number, @GetUser() user: User, @Body() request: PhotoCommentCreateRequest) {
-    return this.photoService.createComment(id, user, request);
+  async createComment(@Param('id') id: number, @GetUser() viewer: User, @Body() request: PhotoCommentCreateRequest) {
+    return this.photoService.createComment(id, viewer, request);
   }
 
   @ApiOkResponse({
@@ -99,18 +99,18 @@ export class PhotoController {
   async updateComment(
     @Param('id') photoId: number,
     @Param('commentId') commentId: number,
-    @GetUser() user: User,
+    @GetUser() viewer: User,
     @Body() request: PhotoCommentUpdateRequest,
   ) {
-    return this.photoService.updateComment(photoId, commentId, user, request);
+    return this.photoService.updateComment(photoId, commentId, viewer, request);
   }
 
   @ApiOkResponse({
     type: PhotoCommentResponse,
   })
   @Delete(':id/comments/:commentId')
-  async deleteComment(@Param('id') photoId: number, @Param('commentId') commentId: number, @GetUser() user: User) {
-    return this.photoService.deleteComment(photoId, commentId, user);
+  async deleteComment(@Param('id') photoId: number, @Param('commentId') commentId: number, @GetUser() viewer: User) {
+    return this.photoService.deleteComment(photoId, commentId, viewer);
   }
 
   @ApiCreatedResponse({

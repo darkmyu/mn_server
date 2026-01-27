@@ -1,6 +1,6 @@
 import { UserResponse } from '@/user/dto/user-response.dto';
 import { ApiProperty } from '@nestjs/swagger';
-import { Prisma } from '@prisma/client';
+import { Prisma, User } from '@prisma/client';
 
 export interface ProfileResponseParams {
   user: Prisma.UserGetPayload<{
@@ -14,6 +14,7 @@ export interface ProfileResponseParams {
       followers: true;
     };
   }>;
+  viewer: User | null;
 }
 
 export class ProfileResponse extends UserResponse {
@@ -26,10 +27,14 @@ export class ProfileResponse extends UserResponse {
   @ApiProperty()
   followings: number;
 
-  constructor({ user }: ProfileResponseParams) {
+  @ApiProperty()
+  isOwner: boolean;
+
+  constructor({ user, viewer }: ProfileResponseParams) {
     super({ user });
     this.isFollowing = user.followers.length > 0;
     this.followers = user._count.followers;
     this.followings = user._count.followings;
+    this.isOwner = user.id === viewer?.id;
   }
 }

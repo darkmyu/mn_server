@@ -17,18 +17,18 @@ export class AnimalService {
     private readonly converterService: ConverterService,
   ) {}
 
-  async all(query: PaginationQuery, user: User) {
+  async all(query: PaginationQuery, viewer: User) {
     const { page, limit } = query;
 
     const [total, animals] = await this.prisma.$transaction([
       this.prisma.animal.count({
         where: {
-          userId: user.id,
+          userId: viewer.id,
         },
       }),
       this.prisma.animal.findMany({
         where: {
-          userId: user.id,
+          userId: viewer.id,
         },
         include: {
           user: true,
@@ -48,7 +48,7 @@ export class AnimalService {
     return new Pagination(items, page, total, limit, hasNextPage);
   }
 
-  async read(id: number, user: User) {
+  async read(id: number, viewer: User) {
     const animal = await this.prisma.animal.findUnique({
       where: {
         id,
@@ -63,17 +63,17 @@ export class AnimalService {
       throw new NotFoundException('animal is not found');
     }
 
-    if (animal.userId !== user.id) {
+    if (animal.userId !== viewer.id) {
       throw new UnauthorizedException('you are not the owner of this animal');
     }
 
     return new AnimalResponse({ animal });
   }
 
-  async create(user: User, request: AnimalCreateRequest) {
+  async create(viewer: User, request: AnimalCreateRequest) {
     const animal = await this.prisma.animal.create({
       data: {
-        userId: user.id,
+        userId: viewer.id,
         breedId: request.breedId,
         name: request.name,
         gender: request.gender,
@@ -89,7 +89,7 @@ export class AnimalService {
     return new AnimalResponse({ animal });
   }
 
-  async update(id: number, user: User, request: AnimalUpdateRequest) {
+  async update(id: number, viewer: User, request: AnimalUpdateRequest) {
     const animal = await this.prisma.animal.findUnique({
       where: {
         id,
@@ -100,7 +100,7 @@ export class AnimalService {
       throw new NotFoundException('animal is not found');
     }
 
-    if (animal.userId !== user.id) {
+    if (animal.userId !== viewer.id) {
       throw new UnauthorizedException('you are not the owner of this animal');
     }
 
@@ -124,7 +124,7 @@ export class AnimalService {
     return new AnimalResponse({ animal: updatedAnimal });
   }
 
-  async delete(id: number, user: User) {
+  async delete(id: number, viewer: User) {
     const animal = await this.prisma.animal.findUnique({
       where: {
         id,
@@ -135,7 +135,7 @@ export class AnimalService {
       throw new NotFoundException('animal is not found');
     }
 
-    if (animal.userId !== user.id) {
+    if (animal.userId !== viewer.id) {
       throw new UnauthorizedException('you are not the owner of this animal');
     }
 

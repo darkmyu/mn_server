@@ -3,7 +3,7 @@ import { FileResponse } from '@/file/dto/file-response.dto';
 import { ProfileResponse } from '@/profile/dto/profile-response.dto';
 import { TagResponse } from '@/tag/dto/tag-response.dto';
 import { ApiProperty } from '@nestjs/swagger';
-import { Prisma } from '@prisma/client';
+import { Prisma, User } from '@prisma/client';
 
 export interface PhotoResponseParams {
   photo: Prisma.PhotoGetPayload<{
@@ -38,6 +38,7 @@ export interface PhotoResponseParams {
       photoLikes: true;
     };
   }>;
+  viewer: User | null;
 }
 
 export class PhotoResponse {
@@ -80,7 +81,7 @@ export class PhotoResponse {
   @ApiProperty()
   author: ProfileResponse;
 
-  constructor({ photo }: PhotoResponseParams) {
+  constructor({ photo, viewer }: PhotoResponseParams) {
     this.id = photo.id;
     this.title = photo.title;
     this.description = photo.description;
@@ -88,7 +89,7 @@ export class PhotoResponse {
     this.isLike = photo.photoLikes.length > 0;
     this.tags = photo.photoTags.map(({ tag }) => new TagResponse({ tag }));
     this.animals = photo.photoAnimals.map(({ animal }) => new AnimalResponse({ animal }));
-    this.author = new ProfileResponse({ user: photo.user });
+    this.author = new ProfileResponse({ user: photo.user, viewer });
 
     if (photo.photoImage) {
       this.image = new FileResponse(

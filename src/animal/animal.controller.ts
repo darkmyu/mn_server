@@ -31,40 +31,40 @@ export class AnimalController {
 
   @ApiOkResponsePagination(AnimalResponse)
   @Get()
-  async all(@Query() query: PaginationQuery, @GetUser() user: User) {
-    return this.animalService.all(query, user);
+  async all(@Query() query: PaginationQuery, @GetUser() viewer: User) {
+    return this.animalService.all(query, viewer);
   }
 
   @ApiOkResponse({
     type: AnimalResponse,
   })
   @Get(':id')
-  async read(@Param('id') id: number, @GetUser() user: User) {
-    return this.animalService.read(id, user);
+  async read(@Param('id') id: number, @GetUser() viewer: User) {
+    return this.animalService.read(id, viewer);
   }
 
   @ApiCreatedResponse({
     type: AnimalResponse,
   })
   @Post()
-  async create(@GetUser() user: User, @Body() request: AnimalCreateRequest) {
-    return this.animalService.create(user, request);
+  async create(@GetUser() viewer: User, @Body() request: AnimalCreateRequest) {
+    return this.animalService.create(viewer, request);
   }
 
   @ApiOkResponse({
     type: AnimalResponse,
   })
   @Put(':id')
-  async update(@Param('id') id: number, @GetUser() user: User, @Body() request: AnimalUpdateRequest) {
-    return this.animalService.update(id, user, request);
+  async update(@Param('id') id: number, @GetUser() viewer: User, @Body() request: AnimalUpdateRequest) {
+    return this.animalService.update(id, viewer, request);
   }
 
   @ApiOkResponse({
     type: AnimalResponse,
   })
   @Delete(':id')
-  async delete(@Param('id') id: number, @GetUser() user: User) {
-    return this.animalService.delete(id, user);
+  async delete(@Param('id') id: number, @GetUser() viewer: User) {
+    return this.animalService.delete(id, viewer);
   }
 
   @ApiCreatedResponse({
