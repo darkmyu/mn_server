@@ -1,11 +1,34 @@
 import { ProfileResponse } from '@/profile/dto/profile-response.dto';
 import { ApiProperty } from '@nestjs/swagger';
-import { PhotoComment } from '@prisma/client';
+import { Prisma } from '@prisma/client';
 
 export interface PhotoCommentResponseParams {
-  comment: PhotoComment;
-  author: ProfileResponse;
-  mention: ProfileResponse | null;
+  comment: Prisma.PhotoCommentGetPayload<{
+    include: {
+      user: {
+        include: {
+          _count: {
+            select: {
+              followers: true;
+              followings: true;
+            };
+          };
+          followers: true;
+        };
+      };
+      mention: {
+        include: {
+          _count: {
+            select: {
+              followers: true;
+              followings: true;
+            };
+          };
+          followers: true;
+        };
+      };
+    };
+  }>;
 }
 
 export class PhotoCommentResponse {
@@ -36,13 +59,13 @@ export class PhotoCommentResponse {
   })
   mention: ProfileResponse | null;
 
-  constructor({ comment, mention, author }: PhotoCommentResponseParams) {
+  constructor({ comment }: PhotoCommentResponseParams) {
     this.id = comment.id;
     this.content = comment.content;
     this.createdAt = comment.createdAt;
     this.updatedAt = comment.updatedAt;
+    this.author = new ProfileResponse({ user: comment.user });
     this.parentId = comment.parentId;
-    this.mention = mention;
-    this.author = author;
+    this.mention = comment.mention ? new ProfileResponse({ user: comment.mention }) : null;
   }
 }

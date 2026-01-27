@@ -5,7 +5,6 @@ import { PaginationQuery } from '@/common/dto/pagination-query.dto';
 import { Pagination } from '@/common/dto/pagination.dto';
 import { PhotoResponse } from '@/photo/dto/photo-response.dto';
 import { PrismaService } from '@/prisma/prisma.service';
-import { TagResponse } from '@/tag/dto/tag-response.dto';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Prisma, User } from '@prisma/client';
 import { ProfileFollowResponse } from './dto/profile-follow-response.dto';
@@ -15,8 +14,8 @@ import { ProfileResponse } from './dto/profile-response.dto';
 export class ProfileService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async read(username: string, user: User | null) {
-    const target = await this.prisma.user.findUnique({
+  async read(username: string, viewer: User | null) {
+    const user = await this.prisma.user.findUnique({
       where: {
         username,
       },
@@ -29,23 +28,17 @@ export class ProfileService {
         },
         followers: {
           where: {
-            followerId: user ? user.id : -1,
+            followerId: viewer ? viewer.id : -1,
           },
         },
       },
     });
 
-    if (!target) {
-      throw new NotFoundException('target is not found');
+    if (!user) {
+      throw new NotFoundException('user is not found');
     }
 
-    return new ProfileResponse({
-      user: target,
-      isFollowing: target.followers.length > 0,
-      followers: target._count.followers,
-      followings: target._count.followings,
-      isOwner: target.id === user?.id,
-    });
+    return new ProfileResponse({ user });
   }
 
   async animals(username: string, query: PaginationQuery) {
@@ -83,15 +76,7 @@ export class ProfileService {
       }),
     ]);
 
-    const items = animals.map(
-      (animal) =>
-        new AnimalResponse({
-          animal,
-          user: animal.user,
-          breed: animal.breed,
-        }),
-    );
-
+    const items = animals.map((animal) => new AnimalResponse({ animal }));
     const hasNextPage = page * limit < total;
 
     return new Pagination(items, page, total, limit, hasNextPage);
@@ -172,31 +157,7 @@ export class ProfileService {
       photos.pop();
     }
 
-    const items = photos.map(
-      (photo) =>
-        new PhotoResponse({
-          photo,
-          image: photo.photoImage!,
-          tags: photo.photoTags.map(({ tag }) => new TagResponse({ tag })),
-          isLike: photo.photoLikes.length > 0,
-          animals: photo.photoAnimals.map(
-            ({ animal }) =>
-              new AnimalResponse({
-                animal,
-                user: animal.user,
-                breed: animal.breed,
-              }),
-          ),
-          author: new ProfileResponse({
-            user: photo.user,
-            isFollowing: photo.user.followers.length > 0,
-            followers: photo.user._count.followers,
-            followings: photo.user._count.followings,
-            isOwner: photo.userId === user?.id,
-          }),
-        }),
-    );
-
+    const items = photos.map((photo) => new PhotoResponse({ photo }));
     const nextCursor = hasNextPage ? photos[photos.length - 1].id : null;
 
     return new CursorPagination(items, nextCursor, total, limit, hasNextPage);
@@ -261,27 +222,7 @@ export class ProfileService {
       throw new NotFoundException('photo is not found');
     }
 
-    return new PhotoResponse({
-      photo,
-      image: photo.photoImage!,
-      tags: photo.photoTags.map(({ tag }) => new TagResponse({ tag })),
-      isLike: photo.photoLikes.length > 0,
-      animals: photo.photoAnimals.map(
-        ({ animal }) =>
-          new AnimalResponse({
-            animal,
-            user: animal.user,
-            breed: animal.breed,
-          }),
-      ),
-      author: new ProfileResponse({
-        user: photo.user,
-        isFollowing: photo.user.followers.length > 0,
-        followers: photo.user._count.followers,
-        followings: photo.user._count.followings,
-        isOwner: photo.userId === user?.id,
-      }),
-    });
+    return new PhotoResponse({ photo });
   }
 
   async follow(username: string, user: User) {
