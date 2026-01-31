@@ -1,8 +1,6 @@
 import { AnimalResponse } from '@/animal/dto/animal-response.dto';
 import { CursorPaginationQuery } from '@/common/dto/cursor-pagination-query.dto';
 import { CursorPagination } from '@/common/dto/cursor-pagination.dto';
-import { PaginationQuery } from '@/common/dto/pagination-query.dto';
-import { Pagination } from '@/common/dto/pagination.dto';
 import { PhotoResponse } from '@/photo/dto/photo-response.dto';
 import { PrismaService } from '@/prisma/prisma.service';
 import { Injectable, NotFoundException } from '@nestjs/common';
@@ -41,8 +39,8 @@ export class ProfileService {
     return new ProfileResponse({ user, viewer });
   }
 
-  async animals(username: string, query: PaginationQuery) {
-    const { page, limit } = query;
+  async animals(username: string, query: CursorPaginationQuery) {
+    const { cursor, limit } = query;
 
     const user = await this.prisma.user.findUnique({
       where: {
@@ -68,18 +66,24 @@ export class ProfileService {
           user: true,
           breed: true,
         },
-        take: limit,
-        skip: (page - 1) * limit,
+        take: limit + 1,
+        skip: cursor ? 1 : 0,
+        cursor: cursor ? { id: cursor } : Prisma.skip,
         orderBy: {
           id: 'asc',
         },
       }),
     ]);
 
-    const items = animals.map((animal) => new AnimalResponse({ animal }));
-    const hasNextPage = page * limit < total;
+    const hasNextPage = animals.length > limit;
+    if (hasNextPage) {
+      animals.pop();
+    }
 
-    return new Pagination(items, page, total, limit, hasNextPage);
+    const items = animals.map((animal) => new AnimalResponse({ animal }));
+    const nextCursor = hasNextPage ? animals[animals.length - 1].id : null;
+
+    return new CursorPagination(items, nextCursor, total, limit, hasNextPage);
   }
 
   async photos(username: string, query: CursorPaginationQuery, viewer: User | null) {

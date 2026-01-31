@@ -1,6 +1,6 @@
 import { GetUser } from '@/auth/decorator/get-user.decorator';
-import { ApiOkResponsePagination } from '@/common/decorator/api-ok-response-pagination.dto';
-import { PaginationQuery } from '@/common/dto/pagination-query.dto';
+import { ApiOkResponseCursorPagination } from '@/common/decorator/api-ok-response-cursor-pagination.dto';
+import { CursorPaginationQuery } from '@/common/dto/cursor-pagination-query.dto';
 import { FileResponse } from '@/file/dto/file-response.dto';
 import {
   Body,
@@ -29,9 +29,9 @@ import { AnimalUpdateRequest } from './dto/animal-update-request.dto';
 export class AnimalController {
   constructor(private readonly animalService: AnimalService) {}
 
-  @ApiOkResponsePagination(AnimalResponse)
+  @ApiOkResponseCursorPagination(AnimalResponse)
   @Get()
-  async all(@Query() query: PaginationQuery, @GetUser() viewer: User) {
+  async all(@Query() query: CursorPaginationQuery, @GetUser() viewer: User) {
     return this.animalService.all(query, viewer);
   }
 

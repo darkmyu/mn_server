@@ -1,7 +1,6 @@
 import { AlgorithmService } from '@/algorithm/algorithm.service';
+import { CursorPaginationQuery } from '@/common/dto/cursor-pagination-query.dto';
 import { CursorPagination } from '@/common/dto/cursor-pagination.dto';
-import { PaginationQuery } from '@/common/dto/pagination-query.dto';
-import { Pagination } from '@/common/dto/pagination.dto';
 import { ConverterService } from '@/converter/converter.service';
 import { FileService } from '@/file/file.service';
 import { PrismaService } from '@/prisma/prisma.service';
@@ -511,7 +510,7 @@ export class PhotoService {
     });
   }
 
-  async getComments(id: number, query: PaginationQuery, viewer: User | null) {
+  async getComments(id: number, query: CursorPaginationQuery, viewer: User | null) {
     const photo = await this.prisma.photo.findUnique({
       where: {
         id,
@@ -522,7 +521,7 @@ export class PhotoService {
       throw new NotFoundException('photo is not found');
     }
 
-    const { page, limit } = query;
+    const { cursor, limit } = query;
 
     const [total, comments] = await this.prisma.$transaction([
       this.prisma.photoComment.count({
@@ -572,21 +571,27 @@ export class PhotoService {
             },
           },
         },
-        take: limit,
-        skip: (page - 1) * limit,
+        take: limit + 1,
+        skip: cursor ? 1 : 0,
+        cursor: cursor ? { id: cursor } : Prisma.skip,
         orderBy: {
           id: 'asc',
         },
       }),
     ]);
 
-    const items = comments.map((comment) => new PhotoCommentResponse({ comment, viewer }));
-    const hasNextPage = page * limit < total;
+    const hasNextPage = comments.length > limit;
+    if (hasNextPage) {
+      comments.pop();
+    }
 
-    return new Pagination(items, page, total, limit, hasNextPage);
+    const items = comments.map((comment) => new PhotoCommentResponse({ comment, viewer }));
+    const nextCursor = hasNextPage ? comments[comments.length - 1].id : null;
+
+    return new CursorPagination(items, nextCursor, total, limit, hasNextPage);
   }
 
-  async getReplies(id: number, commentId: number, query: PaginationQuery, viewer: User | null) {
+  async getReplies(id: number, commentId: number, query: CursorPaginationQuery, viewer: User | null) {
     const photo = await this.prisma.photo.findUnique({
       where: {
         id,
@@ -611,7 +616,7 @@ export class PhotoService {
       throw new NotFoundException('parent comment does not belong to this photo');
     }
 
-    const { page, limit } = query;
+    const { cursor, limit } = query;
 
     const [total, comments] = await this.prisma.$transaction([
       this.prisma.photoComment.count({
@@ -660,18 +665,24 @@ export class PhotoService {
             },
           },
         },
-        take: limit,
-        skip: (page - 1) * limit,
+        take: limit + 1,
+        skip: cursor ? 1 : 0,
+        cursor: cursor ? { id: cursor } : Prisma.skip,
         orderBy: {
           id: 'asc',
         },
       }),
     ]);
 
-    const items = comments.map((comment) => new PhotoCommentResponse({ comment, viewer }));
-    const hasNextPage = page * limit < total;
+    const hasNextPage = comments.length > limit;
+    if (hasNextPage) {
+      comments.pop();
+    }
 
-    return new Pagination(items, page, total, limit, hasNextPage);
+    const items = comments.map((comment) => new PhotoCommentResponse({ comment, viewer }));
+    const nextCursor = hasNextPage ? comments[comments.length - 1].id : null;
+
+    return new CursorPagination(items, nextCursor, total, limit, hasNextPage);
   }
 
   async createComment(id: number, viewer: User, request: PhotoCommentCreateRequest) {

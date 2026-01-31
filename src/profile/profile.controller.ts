@@ -3,9 +3,7 @@ import { GetUser } from '@/auth/decorator/get-user.decorator';
 import { IgnoreUnauthorized } from '@/auth/decorator/ignore-unauthorized.decorator';
 import { Public } from '@/auth/decorator/public.decorator';
 import { ApiOkResponseCursorPagination } from '@/common/decorator/api-ok-response-cursor-pagination.dto';
-import { ApiOkResponsePagination } from '@/common/decorator/api-ok-response-pagination.dto';
 import { CursorPaginationQuery } from '@/common/dto/cursor-pagination-query.dto';
-import { PaginationQuery } from '@/common/dto/pagination-query.dto';
 import { PhotoResponse } from '@/photo/dto/photo-response.dto';
 import { Controller, Delete, Get, Param, Post, Query } from '@nestjs/common';
 import { ApiCreatedResponse, ApiOkResponse } from '@nestjs/swagger';
@@ -27,10 +25,10 @@ export class ProfileController {
     return this.profileService.read(username, viewer);
   }
 
-  @ApiOkResponsePagination(AnimalResponse)
+  @ApiOkResponseCursorPagination(AnimalResponse)
   @Public()
   @Get(':username/animals')
-  async animals(@Param('username') username: string, @Query() query: PaginationQuery) {
+  async animals(@Param('username') username: string, @Query() query: CursorPaginationQuery) {
     return this.profileService.animals(username, query);
   }
 

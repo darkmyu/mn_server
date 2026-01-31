@@ -1,10 +1,10 @@
-import { PaginationQuery } from '@/common/dto/pagination-query.dto';
-import { Pagination } from '@/common/dto/pagination.dto';
+import { CursorPaginationQuery } from '@/common/dto/cursor-pagination-query.dto';
+import { CursorPagination } from '@/common/dto/cursor-pagination.dto';
 import { ConverterService } from '@/converter/converter.service';
 import { FileService } from '@/file/file.service';
 import { PrismaService } from '@/prisma/prisma.service';
 import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
-import { User } from '@prisma/client';
+import { Prisma, User } from '@prisma/client';
 import { AnimalCreateRequest } from './dto/animal-create-request.dto';
 import { AnimalResponse } from './dto/animal-response.dto';
 import { AnimalUpdateRequest } from './dto/animal-update-request.dto';
@@ -17,8 +17,8 @@ export class AnimalService {
     private readonly converterService: ConverterService,
   ) {}
 
-  async all(query: PaginationQuery, viewer: User) {
-    const { page, limit } = query;
+  async all(query: CursorPaginationQuery, viewer: User) {
+    const { cursor, limit } = query;
 
     const [total, animals] = await this.prisma.$transaction([
       this.prisma.animal.count({
@@ -34,18 +34,24 @@ export class AnimalService {
           user: true,
           breed: true,
         },
-        take: limit,
-        skip: (page - 1) * limit,
+        take: limit + 1,
+        skip: cursor ? 1 : 0,
+        cursor: cursor ? { id: cursor } : Prisma.skip,
         orderBy: {
           id: 'asc',
         },
       }),
     ]);
 
-    const items = animals.map((animal) => new AnimalResponse({ animal }));
-    const hasNextPage = page * limit < total;
+    const hasNextPage = animals.length > limit;
+    if (hasNextPage) {
+      animals.pop();
+    }
 
-    return new Pagination(items, page, total, limit, hasNextPage);
+    const items = animals.map((animal) => new AnimalResponse({ animal }));
+    const nextCursor = hasNextPage ? animals[animals.length - 1].id : null;
+
+    return new CursorPagination(items, nextCursor, total, limit, hasNextPage);
   }
 
   async read(id: number, viewer: User) {
