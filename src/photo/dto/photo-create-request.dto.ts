@@ -25,7 +25,7 @@ export class PhotoCreateRequest {
   })
   @IsString()
   @IsOptional()
-  title?: string | null;
+  title?: string | null = null;
 
   @ApiPropertyOptional({
     nullable: true,
@@ -33,7 +33,7 @@ export class PhotoCreateRequest {
   })
   @IsString()
   @IsOptional()
-  description?: string | null;
+  description?: string | null = null;
 
   @ApiPropertyOptional()
   @IsArray()

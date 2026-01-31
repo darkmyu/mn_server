@@ -13,7 +13,7 @@ export class PhotoCommentCreateRequest {
   })
   @IsNumber()
   @IsOptional()
-  parentId?: number | null;
+  parentId: number | null = null;
 
   @ApiPropertyOptional({
     nullable: true,
@@ -21,5 +21,5 @@ export class PhotoCommentCreateRequest {
   })
   @IsNumber()
   @IsOptional()
-  mentionId?: number | null;
+  mentionId: number | null = null;
 }

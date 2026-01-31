@@ -31,5 +31,5 @@ export class AnimalCreateRequest {
   })
   @IsString()
   @IsOptional()
-  thumbnail?: string | null;
+  thumbnail?: string | null = null;
 }
