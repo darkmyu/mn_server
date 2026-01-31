@@ -27,6 +27,11 @@ export interface PhotoCommentResponseParams {
           followers: true;
         };
       };
+      _count: {
+        select: {
+          replies: true;
+        };
+      };
     };
   }>;
   viewer: User | null;
@@ -60,6 +65,9 @@ export class PhotoCommentResponse {
   })
   mention: ProfileResponse | null;
 
+  @ApiProperty()
+  replyCount: number;
+
   constructor({ comment, viewer }: PhotoCommentResponseParams) {
     this.id = comment.id;
     this.content = comment.content;
@@ -68,5 +76,6 @@ export class PhotoCommentResponse {
     this.author = new ProfileResponse({ user: comment.user, viewer });
     this.parentId = comment.parentId;
     this.mention = comment.mention ? new ProfileResponse({ user: comment.mention, viewer }) : null;
+    this.replyCount = comment._count.replies;
   }
 }

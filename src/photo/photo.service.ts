@@ -566,6 +566,11 @@ export class PhotoService {
               },
             },
           },
+          _count: {
+            select: {
+              replies: true,
+            },
+          },
         },
         take: limit,
         skip: (page - 1) * limit,
@@ -649,6 +654,11 @@ export class PhotoService {
               },
             },
           },
+          _count: {
+            select: {
+              replies: true,
+            },
+          },
         },
         take: limit,
         skip: (page - 1) * limit,
@@ -730,6 +740,11 @@ export class PhotoService {
             },
           },
         },
+        _count: {
+          select: {
+            replies: true,
+          },
+        },
       },
     });
 
@@ -793,6 +808,11 @@ export class PhotoService {
             },
           },
         },
+        _count: {
+          select: {
+            replies: true,
+          },
+        },
       },
     });
 
@@ -851,6 +871,11 @@ export class PhotoService {
                 followerId: viewer.id,
               },
             },
+          },
+        },
+        _count: {
+          select: {
+            replies: true,
           },
         },
       },
