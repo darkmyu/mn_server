@@ -1,9 +1,3 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString } from 'class-validator';
+import { PhotoCommentCreateRequest } from './photo-comment-create-request.dto';
 
-export class PhotoCommentUpdateRequest {
-  @ApiProperty()
-  @IsString()
-  @IsNotEmpty()
-  content: string;
-}
+export class PhotoCommentUpdateRequest extends PhotoCommentCreateRequest {}

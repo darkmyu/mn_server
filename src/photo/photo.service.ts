@@ -787,6 +787,8 @@ export class PhotoService {
       },
       data: {
         content: request.content,
+        parentId: request.parentId,
+        mentionId: request.mentionId,
       },
       include: {
         user: {
