@@ -31,15 +31,16 @@ enum Gender {
 }
 
 model User {
-  id           Int      @id @default(autoincrement())
-  email        String?
-  nickname     String
-  username     String   @unique
-  provider     Provider
-  providerId   String   @map("provider_id")
-  profileImage String?  @map("profile_image")
-  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz()
-  updatedAt    DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz()
+  id         Int      @id @default(autoincrement())
+  email      String?
+  nickname   String
+  username   String   @unique
+  provider   Provider
+  providerId String   @map("provider_id")
+  thumbnail  String?
+  about      String?
+  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt  DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz()
 
   animals              Animal[]
   photos               Photo[]

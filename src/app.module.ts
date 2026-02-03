@@ -10,6 +10,7 @@ import { FileModule } from './file/file.module';
 import { PhotoModule } from './photo/photo.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { ProfileModule } from './profile/profile.module';
+import { UserModule } from './user/user.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { ProfileModule } from './profile/profile.module';
     ProfileModule,
     BreedModule,
     PhotoModule,
+    UserModule,
   ],
   providers: [
     {

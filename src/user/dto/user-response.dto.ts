@@ -19,12 +19,19 @@ export class UserResponse {
     type: 'string',
     nullable: true,
   })
-  profileImage: string | null;
+  thumbnail: string | null;
+
+  @ApiProperty({
+    type: 'string',
+    nullable: true,
+  })
+  about: string | null;
 
   constructor({ user }: UserResponseParams) {
     this.id = user.id;
     this.username = user.username;
     this.nickname = user.nickname;
-    this.profileImage = user.profileImage;
+    this.thumbnail = user.thumbnail;
+    this.about = user.about;
   }
 }

@@ -27,7 +27,7 @@ export class NaverStrategy extends PassportStrategy(Strategy, 'naver') {
       email,
       provider: Provider.NAVER,
       providerId: id,
-      profileImage: profile_image,
+      thumbnail: profile_image,
     };
 
     const user = await this.authService.validateOAuthUser(oauthUser);

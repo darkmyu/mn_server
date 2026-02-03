@@ -39,7 +39,7 @@ export class KakaoStrategy extends PassportStrategy(Strategy, 'kakao') {
       email: kakao_account.email,
       provider: Provider.KAKAO,
       providerId: id.toString(),
-      profileImage: kakao_account.profile.profile_image_url,
+      thumbnail: kakao_account.profile.profile_image_url,
     };
 
     const user = await this.authService.validateOAuthUser(oauthUser);

@@ -30,7 +30,7 @@ export class AuthService {
         username: request.username,
         provider: oauthUser.provider,
         providerId: oauthUser.providerId,
-        profileImage: oauthUser.profileImage,
+        thumbnail: oauthUser.thumbnail,
       },
     });
 

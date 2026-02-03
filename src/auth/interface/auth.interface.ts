@@ -4,7 +4,7 @@ export interface OAuthUser {
   email: string | null;
   provider: Provider;
   providerId: string;
-  profileImage: string | null;
+  thumbnail: string | null;
 }
 
 export interface TokenPayload {
