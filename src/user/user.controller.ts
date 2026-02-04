@@ -1,6 +1,20 @@
 import { GetUser } from '@/auth/decorator/get-user.decorator';
-import { Body, Controller, Delete, Get, Put } from '@nestjs/common';
-import { ApiOkResponse } from '@nestjs/swagger';
+import { FileResponse } from '@/file/dto/file-response.dto';
+import {
+  Body,
+  Controller,
+  Delete,
+  FileTypeValidator,
+  Get,
+  MaxFileSizeValidator,
+  ParseFilePipe,
+  Post,
+  Put,
+  UploadedFile,
+  UseInterceptors,
+} from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { ApiBody, ApiConsumes, ApiCreatedResponse, ApiOkResponse } from '@nestjs/swagger';
 import { User } from '@prisma/client';
 import { UserResponse } from './dto/user-response.dto';
 import { UserUpdateRequest } from './dto/user-update-request.dto';
@@ -32,5 +46,37 @@ export class UserController {
   @Delete()
   async delete(@GetUser() viewer: User) {
     return this.userService.delete(viewer);
+  }
+
+  @ApiCreatedResponse({
+    type: FileResponse,
+  })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        thumbnail: {
+          type: 'string',
+          format: 'binary',
+        },
+      },
+      required: ['thumbnail'],
+    },
+  })
+  @Post('thumbnail')
+  @UseInterceptors(FileInterceptor('thumbnail'))
+  async thumbnail(
+    @UploadedFile(
+      new ParseFilePipe({
+        validators: [
+          new MaxFileSizeValidator({ maxSize: 1024 * 1024 * 30 }),
+          new FileTypeValidator({ fileType: /image\/(jpeg|png|heic|heif|webp)/ }),
+        ],
+      }),
+    )
+    thumbnail: Express.Multer.File,
+  ) {
+    return this.userService.thumbnail(thumbnail);
   }
 }

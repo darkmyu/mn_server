@@ -8,7 +8,7 @@ import * as sharp from 'sharp';
 import { FileResponse } from './dto/file-response.dto';
 
 interface KeyParams {
-  prefix: 'photos' | 'animals';
+  prefix: 'photos' | 'animals' | 'profiles';
   file: Express.Multer.File;
 }
 

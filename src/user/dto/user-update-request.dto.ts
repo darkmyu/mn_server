@@ -14,4 +14,12 @@ export class UserUpdateRequest {
   @IsString()
   @IsOptional()
   about?: string | null = null;
+
+  @ApiPropertyOptional({
+    nullable: true,
+    type: 'string',
+  })
+  @IsString()
+  @IsOptional()
+  thumbnail?: string | null = null;
 }
