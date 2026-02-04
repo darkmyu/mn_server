@@ -1,5 +1,5 @@
 import { GetUser } from '@/auth/decorator/get-user.decorator';
-import { Body, Controller, Delete, Param, Put } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Put } from '@nestjs/common';
 import { ApiOkResponse } from '@nestjs/swagger';
 import { User } from '@prisma/client';
 import { UserResponse } from './dto/user-response.dto';
@@ -13,16 +13,24 @@ export class UserController {
   @ApiOkResponse({
     type: UserResponse,
   })
-  @Put(':id')
-  async update(@Param('id') id: number, @GetUser() viewer: User, @Body() request: UserUpdateRequest) {
-    return this.userService.update(id, viewer, request);
+  @Get()
+  read(@GetUser() viewer: User) {
+    return this.userService.read(viewer);
   }
 
   @ApiOkResponse({
     type: UserResponse,
   })
-  @Delete(':id')
-  async delete(@Param('id') id: number, @GetUser() viewer: User) {
-    return this.userService.delete(id, viewer);
+  @Put()
+  async update(@GetUser() viewer: User, @Body() request: UserUpdateRequest) {
+    return this.userService.update(viewer, request);
+  }
+
+  @ApiOkResponse({
+    type: UserResponse,
+  })
+  @Delete()
+  async delete(@GetUser() viewer: User) {
+    return this.userService.delete(viewer);
   }
 }

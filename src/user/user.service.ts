@@ -1,5 +1,5 @@
 import { PrismaService } from '@/prisma/prisma.service';
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { User } from '@prisma/client';
 import { UserResponse } from './dto/user-response.dto';
 import { UserUpdateRequest } from './dto/user-update-request.dto';
@@ -8,14 +8,14 @@ import { UserUpdateRequest } from './dto/user-update-request.dto';
 export class UserService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async update(id: number, viewer: User, request: UserUpdateRequest) {
-    if (id !== viewer.id) {
-      throw new UnauthorizedException('you can only update your own profile');
-    }
+  read(viewer: User) {
+    return new UserResponse({ user: viewer });
+  }
 
+  async update(viewer: User, request: UserUpdateRequest) {
     const user = await this.prisma.user.update({
       where: {
-        id,
+        id: viewer.id,
       },
       data: {
         nickname: request.nickname,
@@ -26,14 +26,10 @@ export class UserService {
     return new UserResponse({ user });
   }
 
-  async delete(id: number, viewer: User) {
-    if (id !== viewer.id) {
-      throw new UnauthorizedException('you can only delete your own profile');
-    }
-
+  async delete(viewer: User) {
     const user = await this.prisma.user.delete({
       where: {
-        id,
+        id: viewer.id,
       },
     });
 
