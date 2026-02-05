@@ -1,6 +1,6 @@
 import { CursorPaginationQuery } from '@/common/dto/cursor-pagination-query.dto';
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { IsEnum, IsOptional } from 'class-validator';
+import { IsEnum, IsOptional, IsString } from 'class-validator';
 
 export enum PhotoSort {
   POPULAR = 'POPULAR',
@@ -15,4 +15,9 @@ export class PhotoListQuery extends CursorPaginationQuery {
   @IsOptional()
   @IsEnum(PhotoSort)
   sort: PhotoSort = PhotoSort.POPULAR;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  tag?: string;
 }

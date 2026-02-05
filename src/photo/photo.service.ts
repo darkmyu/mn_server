@@ -24,11 +24,24 @@ export class PhotoService {
   ) {}
 
   async all(query: PhotoListQuery, viewer: User | null) {
-    const { cursor, limit, sort } = query;
+    const { cursor, limit, sort, tag } = query;
+
+    const where: Prisma.PhotoWhereInput = {};
+
+    if (tag) {
+      where.photoTags = {
+        some: {
+          tag: {
+            slug: tag,
+          },
+        },
+      };
+    }
 
     const [total, photos] = await this.prisma.$transaction([
-      this.prisma.photo.count(),
+      this.prisma.photo.count({ where }),
       this.prisma.photo.findMany({
+        where,
         include: {
           user: {
             include: {
