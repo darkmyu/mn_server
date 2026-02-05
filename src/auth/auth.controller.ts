@@ -1,7 +1,7 @@
 import { AppConfigService } from '@/config/app-config.service';
-import { Body, Controller, Get, HttpCode, Post, Res, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, Post, Query, Res, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { ApiOkResponse } from '@nestjs/swagger';
+import { ApiExcludeEndpoint, ApiOkResponse } from '@nestjs/swagger';
 import { User } from '@prisma/client';
 import { CookieOptions, Response } from 'express';
 import { AuthService } from './auth.service';
@@ -11,6 +11,9 @@ import { Public } from './decorator/public.decorator';
 import { AuthCheckDuplicateUsernameRequest } from './dto/auth-check-duplicate-username-request.dto';
 import { AuthInfoResponse } from './dto/auth-info-response.dto';
 import { AuthRegisterRequest } from './dto/auth-register-request.dto';
+import { GoogleAuthGuard } from './guard/google-auth.guard';
+import { KakaoAuthGuard } from './guard/kakao-auth.guard';
+import { NaverAuthGuard } from './guard/naver-auth.guard';
 import { OAuthUser } from './interface/auth.interface';
 
 @Controller('auth')
@@ -31,38 +34,41 @@ export class AuthController {
 
   @Public()
   @Get('google')
-  @UseGuards(AuthGuard('google'))
+  @UseGuards(GoogleAuthGuard)
   async google() {}
 
+  @ApiExcludeEndpoint()
   @Public()
   @Get('google/callback')
   @UseGuards(AuthGuard('google'))
-  async googleCallback(@GetUser() user: User | OAuthUser, @Res() res: Response) {
-    return this.socialCallback(user, res);
+  async googleCallback(@GetUser() user: User | OAuthUser, @Res() res: Response, @Query('state') state?: string) {
+    return this.socialCallback(user, res, state);
   }
 
   @Public()
   @Get('naver')
-  @UseGuards(AuthGuard('naver'))
+  @UseGuards(NaverAuthGuard)
   async naver() {}
 
+  @ApiExcludeEndpoint()
   @Public()
   @Get('naver/callback')
   @UseGuards(AuthGuard('naver'))
-  async naverCallback(@GetUser() user: User | OAuthUser, @Res() res: Response) {
-    return this.socialCallback(user, res);
+  async naverCallback(@GetUser() user: User | OAuthUser, @Res() res: Response, @Query('state') state?: string) {
+    return this.socialCallback(user, res, state);
   }
 
   @Public()
   @Get('kakao')
-  @UseGuards(AuthGuard('kakao'))
+  @UseGuards(KakaoAuthGuard)
   async kakao() {}
 
+  @ApiExcludeEndpoint()
   @Public()
   @Get('kakao/callback')
   @UseGuards(AuthGuard('kakao'))
-  async kakaoCallback(@GetUser() user: User | OAuthUser, @Res() res: Response) {
-    return this.socialCallback(user, res);
+  async kakaoCallback(@GetUser() user: User | OAuthUser, @Res() res: Response, @Query('state') state?: string) {
+    return this.socialCallback(user, res, state);
   }
 
   @ApiOkResponse({
@@ -97,14 +103,15 @@ export class AuthController {
     return res.clearCookie('access_token').clearCookie('refresh_token').send();
   }
 
-  private async socialCallback(user: User | OAuthUser, res: Response) {
+  private async socialCallback(user: User | OAuthUser, res: Response, state?: string) {
     const host = this.appConfigService.host;
+    const redirectUrl = state || host;
 
     if ('id' in user) {
       await this.setAccessTokenCookie(res, user);
       await this.setRefreshTokenCookie(res, user);
 
-      return res.redirect(host);
+      return res.redirect(redirectUrl);
     }
 
     await this.setRegisterTokenCookie(res, user);
