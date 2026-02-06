@@ -33,12 +33,12 @@ enum Gender {
 model User {
   id         Int      @id @default(autoincrement())
   email      String?
-  nickname   String
-  username   String   @unique
+  nickname   String   @db.VarChar(30)
+  username   String   @unique @db.VarChar(30)
   provider   Provider
   providerId String   @map("provider_id")
   thumbnail  String?
-  about      String?
+  about      String?  @db.VarChar(1000)
   createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz()
   updatedAt  DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz()
 
@@ -72,7 +72,7 @@ model Animal {
   userId  Int @map("user_id")
   breedId Int @map("breed_id")
 
-  name      String
+  name      String   @db.VarChar(30)
   gender    Gender
   birthday  DateTime @db.Timestamptz()
   thumbnail String?
@@ -116,8 +116,8 @@ model Photo {
   id     Int @id @default(autoincrement())
   userId Int @map("user_id")
 
-  title       String?
-  description String?
+  title       String?  @db.VarChar(100)
+  description String?  @db.VarChar(1000)
   likes       Int      @default(0)
   score       Float    @default(0)
   createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz()
@@ -201,7 +201,7 @@ model PhotoComment {
   parentId  Int? @map("parent_id")
   mentionId Int? @map("mention_id")
 
-  content   String
+  content   String   @db.VarChar(1000)
   createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz()
   updatedAt DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz()
 

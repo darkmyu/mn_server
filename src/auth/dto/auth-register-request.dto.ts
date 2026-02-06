@@ -1,14 +1,16 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsNotEmpty, IsString, MaxLength } from 'class-validator';
 
 export class AuthRegisterRequest {
   @ApiProperty()
   @IsString()
   @IsNotEmpty()
+  @MaxLength(30)
   nickname: string;
 
   @ApiProperty()
   @IsString()
   @IsNotEmpty()
+  @MaxLength(30)
   username: string;
 }

@@ -1,6 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Gender } from '@prisma/client';
-import { IsDateString, IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsDateString, IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString, MaxLength } from 'class-validator';
 
 export class AnimalCreateRequest {
   @ApiProperty()
@@ -11,6 +11,7 @@ export class AnimalCreateRequest {
   @ApiProperty()
   @IsString()
   @IsNotEmpty()
+  @MaxLength(30)
   name: string;
 
   @ApiProperty({

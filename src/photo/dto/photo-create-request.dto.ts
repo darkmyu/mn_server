@@ -1,7 +1,16 @@
 import { FileRequest } from '@/file/dto/file-request.dto';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { IsArray, IsNotEmpty, IsNotEmptyObject, IsNumber, IsOptional, IsString, ValidateNested } from 'class-validator';
+import {
+  IsArray,
+  IsNotEmpty,
+  IsNotEmptyObject,
+  IsNumber,
+  IsOptional,
+  IsString,
+  MaxLength,
+  ValidateNested,
+} from 'class-validator';
 
 export class PhotoCreateRequest {
   @ApiProperty({
@@ -25,6 +34,7 @@ export class PhotoCreateRequest {
   })
   @IsString()
   @IsOptional()
+  @MaxLength(100)
   title?: string | null = null;
 
   @ApiPropertyOptional({
@@ -33,6 +43,7 @@ export class PhotoCreateRequest {
   })
   @IsString()
   @IsOptional()
+  @MaxLength(1000)
   description?: string | null = null;
 
   @ApiPropertyOptional()
