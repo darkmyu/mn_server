@@ -100,7 +100,16 @@ export class AuthController {
 
   @Post('logout')
   logout(@Res() res: Response) {
-    return res.clearCookie('access_token').clearCookie('refresh_token').send();
+    return res
+      .clearCookie('access_token', {
+        httpOnly: true,
+        domain: this.appConfigService.domain,
+      })
+      .clearCookie('refresh_token', {
+        httpOnly: true,
+        domain: this.appConfigService.domain,
+      })
+      .send();
   }
 
   private async socialCallback(user: User | OAuthUser, res: Response, state?: string) {
