@@ -8,12 +8,12 @@ export class AppConfigService {
 
   get host() {
     return this.configService.get('NODE_ENV', { infer: true }) === 'production'
-      ? 'https://mntop.com'
+      ? 'https://mongnyang.com'
       : 'http://localhost:3000';
   }
 
   get domain() {
-    return this.configService.get('NODE_ENV', { infer: true }) === 'production' ? '.mntop.com' : 'localhost';
+    return this.configService.get('NODE_ENV', { infer: true }) === 'production' ? '.mongnyang.com' : 'localhost';
   }
 
   get accessTokenMaxAge() {
