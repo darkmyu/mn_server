@@ -20,7 +20,7 @@ async function bootstrap() {
     }),
   );
   app.enableCors({
-    origin: process.env.NODE_ENV === 'development' ? /localhost/ : /mntop.com/,
+    origin: process.env.NODE_ENV === 'development' ? /localhost/ : /mongnyang.com/,
     credentials: true,
   });
 

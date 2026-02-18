@@ -8,6 +8,7 @@ import { AppConfigService } from './app-config.service';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
+      envFilePath: [`.env.${process.env.NODE_ENV}`],
       validationSchema: Joi.object({
         PORT: Joi.number().default(4000),
         NODE_ENV: Joi.valid('development', 'production').required(),
