@@ -1,10 +1,10 @@
 import { GetUser } from '@/auth/decorator/get-user.decorator';
+import { MultiFileTypeValidator } from '@/common/validator/multi-file-type.validator';
 import { FileResponse } from '@/file/dto/file-response.dto';
 import {
   Body,
   Controller,
   Delete,
-  FileTypeValidator,
   Get,
   MaxFileSizeValidator,
   ParseFilePipe,
@@ -71,7 +71,9 @@ export class UserController {
       new ParseFilePipe({
         validators: [
           new MaxFileSizeValidator({ maxSize: 1024 * 1024 * 30 }),
-          new FileTypeValidator({ fileType: /image\/(jpeg|png|heic|heif|webp)/ }),
+          new MultiFileTypeValidator({
+            fileTypes: ['image/jpeg', 'image/png', 'image/heic', 'image/heif', 'image/webp'],
+          }),
         ],
       }),
     )
