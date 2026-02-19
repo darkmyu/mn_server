@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
+import * as heicConvert from 'heic-convert';
 import * as path from 'path';
-import * as sharp from 'sharp';
 
 @Injectable()
 export class ConverterService {
@@ -11,7 +11,14 @@ export class ConverterService {
       return file;
     }
 
-    const buffer = await sharp(file.buffer).jpeg().toBuffer();
+    const converted = await heicConvert({
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      buffer: file.buffer as any,
+      format: 'JPEG',
+      quality: 1,
+    });
+
+    const buffer = Buffer.from(converted);
     const originalname = `${path.basename(file.originalname, extname)}.jpeg`;
 
     return {
