@@ -1,6 +1,5 @@
 import { CursorPaginationQuery } from '@/common/dto/cursor-pagination-query.dto';
 import { CursorPagination } from '@/common/dto/cursor-pagination.dto';
-import { ConverterService } from '@/converter/converter.service';
 import { FileService } from '@/file/file.service';
 import { PrismaService } from '@/prisma/prisma.service';
 import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
@@ -14,7 +13,6 @@ export class AnimalService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly fileService: FileService,
-    private readonly converterService: ConverterService,
   ) {}
 
   async all(query: CursorPaginationQuery, viewer: User) {
@@ -159,9 +157,7 @@ export class AnimalService {
   }
 
   async upload(thumbnail: Express.Multer.File) {
-    const converted = await this.converterService.convertHeicToJpeg(thumbnail);
-    const key = this.fileService.generateKey({ prefix: 'animals', file: converted });
-
-    return this.fileService.upload(key, converted);
+    const key = this.fileService.generateKey({ prefix: 'animals', file: thumbnail });
+    return this.fileService.upload(key, thumbnail);
   }
 }

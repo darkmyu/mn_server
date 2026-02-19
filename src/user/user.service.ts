@@ -1,4 +1,3 @@
-import { ConverterService } from '@/converter/converter.service';
 import { FileService } from '@/file/file.service';
 import { PrismaService } from '@/prisma/prisma.service';
 import { Injectable } from '@nestjs/common';
@@ -11,7 +10,6 @@ export class UserService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly fileService: FileService,
-    private readonly converterService: ConverterService,
   ) {}
 
   read(viewer: User) {
@@ -44,9 +42,7 @@ export class UserService {
   }
 
   async thumbnail(thumbnail: Express.Multer.File) {
-    const converted = await this.converterService.convertHeicToJpeg(thumbnail);
-    const key = this.fileService.generateKey({ prefix: 'profiles', file: converted });
-
-    return this.fileService.upload(key, converted);
+    const key = this.fileService.generateKey({ prefix: 'profiles', file: thumbnail });
+    return this.fileService.upload(key, thumbnail);
   }
 }

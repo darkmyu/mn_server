@@ -1,7 +1,6 @@
 import { AlgorithmService } from '@/algorithm/algorithm.service';
 import { CursorPaginationQuery } from '@/common/dto/cursor-pagination-query.dto';
 import { CursorPagination } from '@/common/dto/cursor-pagination.dto';
-import { ConverterService } from '@/converter/converter.service';
 import { FileService } from '@/file/file.service';
 import { PrismaService } from '@/prisma/prisma.service';
 import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
@@ -19,7 +18,6 @@ export class PhotoService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly fileService: FileService,
-    private readonly converterService: ConverterService,
     private readonly algorithmService: AlgorithmService,
   ) {}
 
@@ -911,9 +909,7 @@ export class PhotoService {
   }
 
   async upload(image: Express.Multer.File) {
-    const converted = await this.converterService.convertHeicToJpeg(image);
-    const key = this.fileService.generateKey({ prefix: 'photos', file: converted });
-
-    return this.fileService.upload(key, converted);
+    const key = this.fileService.generateKey({ prefix: 'photos', file: image });
+    return this.fileService.upload(key, image);
   }
 }
