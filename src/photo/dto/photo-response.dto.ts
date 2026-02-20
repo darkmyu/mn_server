@@ -66,6 +66,12 @@ export class PhotoResponse {
   @ApiProperty()
   isLike: boolean;
 
+  @ApiProperty()
+  createdAt: Date;
+
+  @ApiProperty()
+  updatedAt: Date;
+
   @ApiProperty({
     isArray: true,
     type: TagResponse,
@@ -87,6 +93,8 @@ export class PhotoResponse {
     this.description = photo.description;
     this.likes = photo.likes;
     this.isLike = photo.photoLikes.length > 0;
+    this.createdAt = photo.createdAt;
+    this.updatedAt = photo.updatedAt;
     this.tags = photo.photoTags.map(({ tag }) => new TagResponse({ tag }));
     this.animals = photo.photoAnimals.map(({ animal }) => new AnimalResponse({ animal }));
     this.author = new ProfileResponse({ user: photo.user, viewer });
