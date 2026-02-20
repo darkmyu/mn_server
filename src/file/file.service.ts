@@ -33,10 +33,9 @@ export class FileService {
 
   async upload(key: string, file: Express.Multer.File) {
     const metadata = await sharp(file.buffer).metadata();
+    const { width, height } = metadata.autoOrient;
     const path = `${this.R2_URL}/${key}`;
     const size = file.size;
-    const width = metadata.width;
-    const height = metadata.height;
     const mimetype = file.mimetype;
 
     await this.R2.send(
