@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { User } from '@prisma/client';
+import { Provider, User } from '@prisma/client';
 
 interface UserResponseParams {
   user: User;
@@ -27,11 +27,24 @@ export class UserResponse {
   })
   about: string | null;
 
+  @ApiProperty({
+    type: 'string',
+    nullable: true,
+  })
+  email: string | null;
+
+  @ApiProperty({
+    enum: Provider,
+  })
+  provider: Provider;
+
   constructor({ user }: UserResponseParams) {
     this.id = user.id;
     this.username = user.username;
     this.nickname = user.nickname;
     this.thumbnail = user.thumbnail;
     this.about = user.about;
+    this.email = user.email;
+    this.provider = user.provider;
   }
 }
