@@ -13,21 +13,11 @@ jobs:
       - name: Checkout Source Code
         uses: actions/checkout@v4
 
-      - name: Safe Debug Secrets
-        run: |
-          AK="${{ secrets.AWS_ACCESS_KEY_ID }}"
-          SK="${{ secrets.AWS_SECRET_ACCESS_KEY }}"
-
-          echo "Access Key 앞 4자리: ${AK:0:4}****"
-          echo "Access Key 총 길이: ${#AK} (정상: 20)"
-          echo "Secret Key 총 길이: ${#SK} (정상: 40)"
-
       - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
+        uses: aws-actions/configure-aws-credentials@v2
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
           aws-region: ${{ secrets.AWS_REGION }}
 
       - name: Login to Amazon ECR
