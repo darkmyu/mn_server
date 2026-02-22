@@ -1,7 +1,6 @@
 import { PrismaService } from '@/prisma/prisma.service';
 import { Injectable, Logger } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
-import { updatePhotosScore } from '@prisma/client/sql';
 
 @Injectable()
 export class PhotoScheduleService {
@@ -17,7 +16,18 @@ export class PhotoScheduleService {
   async updateAllRanking() {
     this.logger.log('[All] Calculate photo score scheduler start');
 
-    const photos = await this.prisma.$queryRawTyped(updatePhotosScore(this.GRAVITY, this.ALL_MIN_SCORE));
+    const photos = await this.prisma.$queryRaw<unknown[]>`
+      UPDATE "photos"
+      SET "score" = (
+        "likes" / 
+        POWER(
+          (EXTRACT(EPOCH FROM (NOW() - "created_at")) / 3600) + 2, 
+          ${this.GRAVITY}
+        )
+      )
+      WHERE "score" > ${this.ALL_MIN_SCORE}
+      RETURNING "id"
+    `;
 
     this.logger.log(`[All] Calculate photo score scheduler end (count: ${photos.length})`);
   }
@@ -26,7 +36,18 @@ export class PhotoScheduleService {
   async updatePopularRanking() {
     this.logger.log('[Popular] Calculate photo score scheduler start');
 
-    const photos = await this.prisma.$queryRawTyped(updatePhotosScore(this.GRAVITY, this.POPULAR_MIN_SCORE));
+    const photos = await this.prisma.$queryRaw<unknown[]>`
+      UPDATE "photos"
+      SET "score" = (
+        "likes" / 
+        POWER(
+          (EXTRACT(EPOCH FROM (NOW() - "created_at")) / 3600) + 2, 
+          ${this.GRAVITY}
+        )
+      )
+      WHERE "score" > ${this.POPULAR_MIN_SCORE}
+      RETURNING "id"
+    `;
 
     this.logger.log(`[Popular] Calculate photo score scheduler end (count: ${photos.length})`);
   }
