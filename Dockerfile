@@ -13,11 +13,8 @@ RUN yarn install --frozen-lockfile
 # Copy source code
 COPY . .
 
-# Database url variable
-ENV DATABASE_URL="postgresql://mntop:mntop@host.docker.internal:5432/mntop"
-
 # Generate Prisma Client
-RUN npx prisma generate --sql
+RUN npx prisma generate
 
 # Build the application
 RUN yarn build
@@ -26,7 +23,7 @@ RUN yarn build
 # We run prisma generate again to ensure the production node_modules has the client
 RUN rm -rf node_modules && \
     yarn install --frozen-lockfile --production && \
-    npx prisma generate --sql
+    npx prisma generate
 
 # Stage 2: Production
 FROM node:24-alpine
