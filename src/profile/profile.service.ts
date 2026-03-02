@@ -229,6 +229,130 @@ export class ProfileService {
     return new PhotoResponse({ photo, viewer });
   }
 
+  async followers(username: string, query: CursorPaginationQuery, viewer: User | null) {
+    const { cursor, limit } = query;
+
+    const target = await this.prisma.user.findUnique({
+      where: { username },
+    });
+
+    if (!target) {
+      throw new NotFoundException('target is not found');
+    }
+
+    const [total, followers] = await this.prisma.$transaction([
+      this.prisma.user.count({
+        where: {
+          followings: {
+            some: {
+              followingId: target.id,
+            },
+          },
+        },
+      }),
+      this.prisma.user.findMany({
+        where: {
+          followings: {
+            some: {
+              followingId: target.id,
+            },
+          },
+        },
+        include: {
+          followers: {
+            where: {
+              followerId: viewer ? viewer.id : -1,
+            },
+          },
+        },
+        take: limit + 1,
+        skip: cursor ? 1 : 0,
+        cursor: cursor ? { id: cursor } : Prisma.skip,
+        orderBy: {
+          id: 'desc',
+        },
+      }),
+    ]);
+
+    const hasNextPage = followers.length > limit;
+    if (hasNextPage) followers.pop();
+
+    const items = followers.map(
+      (follower) =>
+        new ProfileFollowResponse({
+          user: follower,
+          isOwner: follower.id === viewer?.id,
+          isFollowing: follower.followers.length > 0,
+        }),
+    );
+
+    const nextCursor = hasNextPage ? followers[followers.length - 1].id : null;
+
+    return new CursorPagination(items, nextCursor, total, limit, hasNextPage);
+  }
+
+  async followings(username: string, query: CursorPaginationQuery, viewer: User | null) {
+    const { cursor, limit } = query;
+
+    const target = await this.prisma.user.findUnique({
+      where: { username },
+    });
+
+    if (!target) {
+      throw new NotFoundException('target is not found');
+    }
+
+    const [total, followings] = await this.prisma.$transaction([
+      this.prisma.user.count({
+        where: {
+          followers: {
+            some: {
+              followerId: target.id,
+            },
+          },
+        },
+      }),
+      this.prisma.user.findMany({
+        where: {
+          followers: {
+            some: {
+              followerId: target.id,
+            },
+          },
+        },
+        include: {
+          followers: {
+            where: {
+              followerId: viewer ? viewer.id : -1,
+            },
+          },
+        },
+        take: limit + 1,
+        skip: cursor ? 1 : 0,
+        cursor: cursor ? { id: cursor } : Prisma.skip,
+        orderBy: {
+          id: 'desc',
+        },
+      }),
+    ]);
+
+    const hasNextPage = followings.length > limit;
+    if (hasNextPage) followings.pop();
+
+    const items = followings.map(
+      (following) =>
+        new ProfileFollowResponse({
+          user: following,
+          isOwner: following.id === viewer?.id,
+          isFollowing: following.followers.length > 0,
+        }),
+    );
+
+    const nextCursor = hasNextPage ? followings[followings.length - 1].id : null;
+
+    return new CursorPagination(items, nextCursor, total, limit, hasNextPage);
+  }
+
   async follow(username: string, viewer: User) {
     const target = await this.prisma.user.findUnique({
       where: {
@@ -247,7 +371,11 @@ export class ProfileService {
       },
     });
 
-    return new ProfileFollowResponse(true);
+    return new ProfileFollowResponse({
+      user: target,
+      isOwner: false,
+      isFollowing: true,
+    });
   }
 
   async unfollow(username: string, viewer: User) {
@@ -270,6 +398,10 @@ export class ProfileService {
       },
     });
 
-    return new ProfileFollowResponse(false);
+    return new ProfileFollowResponse({
+      user: target,
+      isOwner: false,
+      isFollowing: false,
+    });
   }
 }

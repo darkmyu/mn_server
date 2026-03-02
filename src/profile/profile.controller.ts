@@ -52,6 +52,28 @@ export class ProfileController {
     return this.profileService.photo(username, id, viewer);
   }
 
+  @ApiOkResponseCursorPagination(ProfileFollowResponse)
+  @IgnoreUnauthorized()
+  @Get(':username/followers')
+  async followers(
+    @Param('username') username: string,
+    @Query() query: CursorPaginationQuery,
+    @GetUser() viewer: User | null,
+  ) {
+    return this.profileService.followers(username, query, viewer);
+  }
+
+  @ApiOkResponseCursorPagination(ProfileFollowResponse)
+  @IgnoreUnauthorized()
+  @Get(':username/followings')
+  async followings(
+    @Param('username') username: string,
+    @Query() query: CursorPaginationQuery,
+    @GetUser() viewer: User | null,
+  ) {
+    return this.profileService.followings(username, query, viewer);
+  }
+
   @ApiCreatedResponse({
     type: ProfileFollowResponse,
   })
