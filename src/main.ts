@@ -24,9 +24,11 @@ async function bootstrap() {
     credentials: true,
   });
 
-  const config = new DocumentBuilder().build();
-  const documentFactory = () => SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, documentFactory);
+  if (process.env.NODE_ENV !== 'production') {
+    const config = new DocumentBuilder().build();
+    const documentFactory = () => SwaggerModule.createDocument(app, config);
+    SwaggerModule.setup('api', app, documentFactory);
+  }
 
   const { httpAdapter } = app.get(HttpAdapterHost);
   app.useGlobalFilters(new PrismaClientExceptionFilter(httpAdapter));
