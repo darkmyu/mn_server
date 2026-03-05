@@ -4,6 +4,7 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as dayjs from 'dayjs';
 import { nanoid } from 'nanoid';
+import { extname } from 'path';
 import * as sharp from 'sharp';
 import { FileResponse } from './dto/file-response.dto';
 
@@ -52,8 +53,8 @@ export class FileService {
 
   generateKey({ prefix, file }: KeyParams) {
     const date = dayjs().format('YYYY-MM-DD');
-    const filename = Buffer.from(file.originalname, 'latin1').toString('utf8');
+    const extension = extname(file.originalname);
 
-    return `${prefix}/${date}/${nanoid()}/${filename}`;
+    return `${prefix}/${date}/${nanoid()}${extension}`;
   }
 }
