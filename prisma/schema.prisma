@@ -30,6 +30,14 @@ enum Gender {
   FEMALE
 }
 
+enum SocialType {
+  INSTAGRAM
+  YOUTUBE
+  X
+  EMAIL
+  WEBSITE
+}
+
 model User {
   id         Int      @id @default(autoincrement())
   email      String?
@@ -45,12 +53,28 @@ model User {
   animals              Animal[]
   photos               Photo[]
   photoLikes           PhotoLike[]
-  followers            UserFollow[]   @relation("user_followings")
-  followings           UserFollow[]   @relation("user_followers")
-  photoComments        PhotoComment[] @relation("photo_comment_author")
-  photoMentionComments PhotoComment[] @relation("photo_comment_mention")
+  followers            UserFollow[]     @relation("user_followings")
+  followings           UserFollow[]     @relation("user_followers")
+  photoComments        PhotoComment[]   @relation("photo_comment_author")
+  photoMentionComments PhotoComment[]   @relation("photo_comment_mention")
+  socialLinks          UserSocialLink[]
 
   @@map("users")
+}
+
+model UserSocialLink {
+  id     Int @id @default(autoincrement())
+  userId Int @map("user_id")
+
+  type      SocialType
+  url       String     @db.VarChar(500)
+  createdAt DateTime   @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt DateTime   @default(now()) @updatedAt @map("updated_at") @db.Timestamptz()
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, type])
+  @@map("user_social_links")
 }
 
 model UserFollow {
