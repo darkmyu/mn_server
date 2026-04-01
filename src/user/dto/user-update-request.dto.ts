@@ -33,5 +33,5 @@ export class UserUpdateRequest {
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => UserSocialLinkRequest)
-  socialLinks: UserSocialLinkRequest[];
+  socialLinks: UserSocialLinkRequest[] = [];
 }
