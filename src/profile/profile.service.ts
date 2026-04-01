@@ -29,6 +29,7 @@ export class ProfileService {
             followerId: viewer ? viewer.id : -1,
           },
         },
+        socialLinks: true,
       },
     });
 

@@ -1,6 +1,6 @@
 import { UserResponse } from '@/user/dto/user-response.dto';
 import { ApiProperty } from '@nestjs/swagger';
-import { Prisma, User } from '@prisma/client';
+import { Prisma, User, UserSocialLink } from '@prisma/client';
 
 export interface ProfileResponseParams {
   user: Prisma.UserGetPayload<{
@@ -13,7 +13,9 @@ export interface ProfileResponseParams {
       };
       followers: true;
     };
-  }>;
+  }> & {
+    socialLinks?: UserSocialLink[];
+  };
   viewer: User | null;
 }
 

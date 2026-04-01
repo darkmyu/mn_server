@@ -1,5 +1,7 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsNotEmpty, IsOptional, IsString, MaxLength } from 'class-validator';
+import { Type } from 'class-transformer';
+import { IsArray, IsNotEmpty, IsOptional, IsString, MaxLength, ValidateNested } from 'class-validator';
+import { UserSocialLinkRequest } from './user-social-link-request.dto';
 
 export class UserUpdateRequest {
   @ApiProperty()
@@ -24,4 +26,12 @@ export class UserUpdateRequest {
   @IsString()
   @IsOptional()
   thumbnail?: string | null = null;
+
+  @ApiProperty({
+    type: [UserSocialLinkRequest],
+  })
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => UserSocialLinkRequest)
+  socialLinks: UserSocialLinkRequest[];
 }

@@ -1,8 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Provider, User } from '@prisma/client';
+import { Provider, User, UserSocialLink } from '@prisma/client';
+import { UserSocialLinkResponse } from './user-social-link-response.dto';
 
 interface UserResponseParams {
-  user: User;
+  user: User & {
+    socialLinks?: UserSocialLink[];
+  };
 }
 
 export class UserResponse {
@@ -38,6 +41,11 @@ export class UserResponse {
   })
   provider: Provider;
 
+  @ApiProperty({
+    type: [UserSocialLinkResponse],
+  })
+  socialLinks: UserSocialLinkResponse[];
+
   constructor({ user }: UserResponseParams) {
     this.id = user.id;
     this.username = user.username;
@@ -46,5 +54,6 @@ export class UserResponse {
     this.about = user.about;
     this.email = user.email;
     this.provider = user.provider;
+    this.socialLinks = user.socialLinks?.map((socialLink) => new UserSocialLinkResponse({ socialLink })) ?? [];
   }
 }

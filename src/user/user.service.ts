@@ -25,6 +25,16 @@ export class UserService {
         nickname: request.nickname,
         about: request.about,
         thumbnail: request.thumbnail,
+        socialLinks: {
+          deleteMany: {},
+          create: request.socialLinks.map((socialLink) => ({
+            type: socialLink.type,
+            url: socialLink.url,
+          })),
+        },
+      },
+      include: {
+        socialLinks: true,
       },
     });
 
