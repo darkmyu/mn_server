@@ -3,6 +3,7 @@ import { PrismaService } from '@/prisma/prisma.service';
 import { Injectable } from '@nestjs/common';
 import { User } from '@prisma/client';
 import { UserResponse } from './dto/user-response.dto';
+import { UserSummaryResponse } from './dto/user-summary-response.dto';
 import { UserUpdateRequest } from './dto/user-update-request.dto';
 
 @Injectable()
@@ -57,7 +58,7 @@ export class UserService {
       },
     });
 
-    return new UserResponse({ user });
+    return new UserSummaryResponse({ user });
   }
 
   async thumbnail(thumbnail: Express.Multer.File) {

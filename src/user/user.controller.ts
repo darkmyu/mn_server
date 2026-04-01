@@ -17,6 +17,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBody, ApiConsumes, ApiCreatedResponse, ApiOkResponse } from '@nestjs/swagger';
 import { User } from '@prisma/client';
 import { UserResponse } from './dto/user-response.dto';
+import { UserSummaryResponse } from './dto/user-summary-response.dto';
 import { UserUpdateRequest } from './dto/user-update-request.dto';
 import { UserService } from './user.service';
 
@@ -41,7 +42,7 @@ export class UserController {
   }
 
   @ApiOkResponse({
-    type: UserResponse,
+    type: UserSummaryResponse,
   })
   @Delete()
   async delete(@GetUser() viewer: User) {

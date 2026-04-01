@@ -1,32 +1,12 @@
-import { ProfileResponse } from '@/profile/dto/profile-response.dto';
+import { UserSummaryResponse } from '@/user/dto/user-summary-response.dto';
 import { ApiProperty } from '@nestjs/swagger';
 import { Prisma, User } from '@prisma/client';
 
 export interface PhotoCommentResponseParams {
   comment: Prisma.PhotoCommentGetPayload<{
     include: {
-      user: {
-        include: {
-          _count: {
-            select: {
-              followers: true;
-              followings: true;
-            };
-          };
-          followers: true;
-        };
-      };
-      mention: {
-        include: {
-          _count: {
-            select: {
-              followers: true;
-              followings: true;
-            };
-          };
-          followers: true;
-        };
-      };
+      user: true;
+      mention: true;
       _count: {
         select: {
           replies: true;
@@ -51,7 +31,7 @@ export class PhotoCommentResponse {
   updatedAt: Date;
 
   @ApiProperty()
-  author: ProfileResponse;
+  author: UserSummaryResponse;
 
   @ApiProperty({
     type: 'number',
@@ -60,22 +40,26 @@ export class PhotoCommentResponse {
   parentId: number | null;
 
   @ApiProperty({
-    type: ProfileResponse,
+    type: UserSummaryResponse,
     nullable: true,
   })
-  mention: ProfileResponse | null;
+  mention: UserSummaryResponse | null;
 
   @ApiProperty()
   replyCount: number;
+
+  @ApiProperty()
+  isOwner: boolean;
 
   constructor({ comment, viewer }: PhotoCommentResponseParams) {
     this.id = comment.id;
     this.content = comment.content;
     this.createdAt = comment.createdAt;
     this.updatedAt = comment.updatedAt;
-    this.author = new ProfileResponse({ user: comment.user, viewer });
+    this.author = new UserSummaryResponse({ user: comment.user });
     this.parentId = comment.parentId;
-    this.mention = comment.mention ? new ProfileResponse({ user: comment.mention, viewer }) : null;
+    this.mention = comment.mention ? new UserSummaryResponse({ user: comment.mention }) : null;
     this.replyCount = comment._count.replies;
+    this.isOwner = comment.user.id === viewer?.id;
   }
 }

@@ -17,6 +17,7 @@ export interface PhotoResponseParams {
             };
           };
           followers: true;
+          socialLinks: true;
         };
       };
       photoImage: true;

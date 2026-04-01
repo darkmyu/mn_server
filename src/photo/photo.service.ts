@@ -54,6 +54,7 @@ export class PhotoService {
                   followerId: viewer ? viewer.id : -1,
                 },
               },
+              socialLinks: true,
             },
           },
           photoImage: true,
@@ -115,6 +116,7 @@ export class PhotoService {
                 followerId: viewer.id,
               },
             },
+            socialLinks: true,
           },
         },
         photoImage: true,
@@ -220,6 +222,7 @@ export class PhotoService {
                 followerId: viewer.id,
               },
             },
+            socialLinks: true,
           },
         },
         photoImage: true,
@@ -336,6 +339,7 @@ export class PhotoService {
                 followerId: viewer.id,
               },
             },
+            socialLinks: true,
           },
         },
         photoImage: true,
@@ -398,6 +402,7 @@ export class PhotoService {
                 followerId: viewer.id,
               },
             },
+            socialLinks: true,
           },
         },
         photoImage: true,
@@ -546,36 +551,8 @@ export class PhotoService {
           parentId: null,
         },
         include: {
-          user: {
-            include: {
-              _count: {
-                select: {
-                  followers: true,
-                  followings: true,
-                },
-              },
-              followers: {
-                where: {
-                  followerId: viewer ? viewer.id : -1,
-                },
-              },
-            },
-          },
-          mention: {
-            include: {
-              _count: {
-                select: {
-                  followers: true,
-                  followings: true,
-                },
-              },
-              followers: {
-                where: {
-                  followerId: viewer ? viewer.id : -1,
-                },
-              },
-            },
-          },
+          user: true,
+          mention: true,
           _count: {
             select: {
               replies: true,
@@ -640,36 +617,8 @@ export class PhotoService {
           parentId: commentId,
         },
         include: {
-          user: {
-            include: {
-              _count: {
-                select: {
-                  followers: true,
-                  followings: true,
-                },
-              },
-              followers: {
-                where: {
-                  followerId: viewer ? viewer.id : -1,
-                },
-              },
-            },
-          },
-          mention: {
-            include: {
-              _count: {
-                select: {
-                  followers: true,
-                  followings: true,
-                },
-              },
-              followers: {
-                where: {
-                  followerId: viewer ? viewer.id : -1,
-                },
-              },
-            },
-          },
+          user: true,
+          mention: true,
           _count: {
             select: {
               replies: true,
@@ -732,36 +681,8 @@ export class PhotoService {
         mentionId: request.mentionId,
       },
       include: {
-        user: {
-          include: {
-            _count: {
-              select: {
-                followers: true,
-                followings: true,
-              },
-            },
-            followers: {
-              where: {
-                followerId: viewer.id,
-              },
-            },
-          },
-        },
-        mention: {
-          include: {
-            _count: {
-              select: {
-                followers: true,
-                followings: true,
-              },
-            },
-            followers: {
-              where: {
-                followerId: viewer.id,
-              },
-            },
-          },
-        },
+        user: true,
+        mention: true,
         _count: {
           select: {
             replies: true,
@@ -802,36 +723,8 @@ export class PhotoService {
         mentionId: request.mentionId,
       },
       include: {
-        user: {
-          include: {
-            _count: {
-              select: {
-                followers: true,
-                followings: true,
-              },
-            },
-            followers: {
-              where: {
-                followerId: viewer.id,
-              },
-            },
-          },
-        },
-        mention: {
-          include: {
-            _count: {
-              select: {
-                followers: true,
-                followings: true,
-              },
-            },
-            followers: {
-              where: {
-                followerId: viewer.id,
-              },
-            },
-          },
-        },
+        user: true,
+        mention: true,
         _count: {
           select: {
             replies: true,
@@ -867,36 +760,8 @@ export class PhotoService {
         id: commentId,
       },
       include: {
-        user: {
-          include: {
-            _count: {
-              select: {
-                followers: true,
-                followings: true,
-              },
-            },
-            followers: {
-              where: {
-                followerId: viewer.id,
-              },
-            },
-          },
-        },
-        mention: {
-          include: {
-            _count: {
-              select: {
-                followers: true,
-                followings: true,
-              },
-            },
-            followers: {
-              where: {
-                followerId: viewer.id,
-              },
-            },
-          },
-        },
+        user: true,
+        mention: true,
         _count: {
           select: {
             replies: true,

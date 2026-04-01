@@ -1,29 +1,17 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Provider, User, UserSocialLink } from '@prisma/client';
+import { Prisma, Provider } from '@prisma/client';
 import { UserSocialLinkResponse } from './user-social-link-response.dto';
+import { UserSummaryResponse } from './user-summary-response.dto';
 
 interface UserResponseParams {
-  user: User & {
-    socialLinks?: UserSocialLink[];
-  };
+  user: Prisma.UserGetPayload<{
+    include: {
+      socialLinks: true;
+    };
+  }>;
 }
 
-export class UserResponse {
-  @ApiProperty()
-  id: number;
-
-  @ApiProperty()
-  username: string;
-
-  @ApiProperty()
-  nickname: string;
-
-  @ApiProperty({
-    type: 'string',
-    nullable: true,
-  })
-  thumbnail: string | null;
-
+export class UserResponse extends UserSummaryResponse {
   @ApiProperty({
     type: 'string',
     nullable: true,
@@ -47,13 +35,10 @@ export class UserResponse {
   socialLinks: UserSocialLinkResponse[];
 
   constructor({ user }: UserResponseParams) {
-    this.id = user.id;
-    this.username = user.username;
-    this.nickname = user.nickname;
-    this.thumbnail = user.thumbnail;
+    super({ user });
     this.about = user.about;
     this.email = user.email;
     this.provider = user.provider;
-    this.socialLinks = user.socialLinks?.map((socialLink) => new UserSocialLinkResponse({ socialLink })) ?? [];
+    this.socialLinks = user.socialLinks.map((socialLink) => new UserSocialLinkResponse({ socialLink }));
   }
 }
