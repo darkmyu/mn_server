@@ -12,8 +12,17 @@ export class UserService {
     private readonly fileService: FileService,
   ) {}
 
-  read(viewer: User) {
-    return new UserResponse({ user: viewer });
+  async read(viewer: User) {
+    const user = await this.prisma.user.findUniqueOrThrow({
+      where: {
+        id: viewer.id,
+      },
+      include: {
+        socialLinks: true,
+      },
+    });
+
+    return new UserResponse({ user });
   }
 
   async update(viewer: User, request: UserUpdateRequest) {

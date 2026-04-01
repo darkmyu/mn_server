@@ -28,7 +28,7 @@ export class UserController {
     type: UserResponse,
   })
   @Get()
-  read(@GetUser() viewer: User) {
+  async read(@GetUser() viewer: User) {
     return this.userService.read(viewer);
   }
 
