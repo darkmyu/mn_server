@@ -30,7 +30,7 @@ enum Gender {
   FEMALE
 }
 
-enum SocialType {
+enum Social {
   INSTAGRAM
   YOUTUBE
   X
@@ -66,10 +66,10 @@ model UserSocialLink {
   id     Int @id @default(autoincrement())
   userId Int @map("user_id")
 
-  type      SocialType
-  url       String     @db.VarChar(500)
-  createdAt DateTime   @default(now()) @map("created_at") @db.Timestamptz()
-  updatedAt DateTime   @default(now()) @updatedAt @map("updated_at") @db.Timestamptz()
+  type      Social
+  url       String   @db.VarChar(500)
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz()
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
