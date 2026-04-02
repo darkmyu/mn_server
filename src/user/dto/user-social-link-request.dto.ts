@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Social } from '@prisma/client';
-import { IsEnum, IsNotEmpty, IsUrl, MaxLength } from 'class-validator';
+import { IsEnum, IsNotEmpty, MaxLength } from 'class-validator';
 
 export class UserSocialLinkRequest {
   @ApiProperty({
@@ -11,7 +11,6 @@ export class UserSocialLinkRequest {
   type: Social;
 
   @ApiProperty()
-  @IsUrl()
   @IsNotEmpty()
   @MaxLength(500)
   url: string;
