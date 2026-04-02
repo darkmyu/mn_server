@@ -54,7 +54,11 @@ export class PhotoService {
                   followerId: viewer ? viewer.id : -1,
                 },
               },
-              socialLinks: true,
+              socialLinks: {
+                orderBy: {
+                  id: 'asc',
+                },
+              },
             },
           },
           photoImage: true,
@@ -116,7 +120,11 @@ export class PhotoService {
                 followerId: viewer.id,
               },
             },
-            socialLinks: true,
+            socialLinks: {
+              orderBy: {
+                id: 'asc',
+              },
+            },
           },
         },
         photoImage: true,
@@ -222,7 +230,11 @@ export class PhotoService {
                 followerId: viewer.id,
               },
             },
-            socialLinks: true,
+            socialLinks: {
+              orderBy: {
+                id: 'asc',
+              },
+            },
           },
         },
         photoImage: true,
@@ -339,7 +351,11 @@ export class PhotoService {
                 followerId: viewer.id,
               },
             },
-            socialLinks: true,
+            socialLinks: {
+              orderBy: {
+                id: 'asc',
+              },
+            },
           },
         },
         photoImage: true,
@@ -402,7 +418,11 @@ export class PhotoService {
                 followerId: viewer.id,
               },
             },
-            socialLinks: true,
+            socialLinks: {
+              orderBy: {
+                id: 'asc',
+              },
+            },
           },
         },
         photoImage: true,

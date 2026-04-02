@@ -19,7 +19,11 @@ export class UserService {
         id: viewer.id,
       },
       include: {
-        socialLinks: true,
+        socialLinks: {
+          orderBy: {
+            id: 'asc',
+          },
+        },
       },
     });
 
@@ -44,7 +48,11 @@ export class UserService {
         },
       },
       include: {
-        socialLinks: true,
+        socialLinks: {
+          orderBy: {
+            id: 'asc',
+          },
+        },
       },
     });
 

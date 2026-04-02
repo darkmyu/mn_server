@@ -29,7 +29,11 @@ export class ProfileService {
             followerId: viewer ? viewer.id : -1,
           },
         },
-        socialLinks: true,
+        socialLinks: {
+          orderBy: {
+            id: 'asc',
+          },
+        },
       },
     });
 
@@ -124,7 +128,11 @@ export class ProfileService {
                   followerId: viewer ? viewer.id : -1,
                 },
               },
-              socialLinks: true,
+              socialLinks: {
+                orderBy: {
+                  id: 'asc',
+                },
+              },
             },
           },
           photoImage: true,
@@ -198,7 +206,11 @@ export class ProfileService {
                 followerId: viewer ? viewer.id : -1,
               },
             },
-            socialLinks: true,
+            socialLinks: {
+              orderBy: {
+                id: 'asc',
+              },
+            },
           },
         },
         photoImage: true,
